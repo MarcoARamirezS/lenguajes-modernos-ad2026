@@ -12,6 +12,7 @@ Esta carpeta contiene la documentación técnica y didáctica del primer proyect
 | 4 | [`SESION_01_INSTALACION_FRONTEND.md`](./SESION_01_INSTALACION_FRONTEND.md) | Instalación del frontend |
 | 5 | [`SESION_02_PRODUCTS_COMPLETO.md`](./SESION_02_PRODUCTS_COMPLETO.md) | Módulo Products |
 | 6 | [`SESION_03_AUTH_USERS_JWT.md`](./SESION_03_AUTH_USERS_JWT.md) | Auth, Users y JWT |
+| HOTFIX | [`Hotfix Monorepo.md`](./HOTIFX_AJUSTES_MONOREPO.md) | Hotfix |
 | 7 | [`SESION_04_RBAC_RUTAS_PRIVADAS.md`](./SESION_04_RBAC_RUTAS_PRIVADAS.md) | Roles y rutas privadas |
 | 8 | [`SESION_05_CATEGORIES_CATALOGO.md`](./SESION_05_CATEGORIES_CATALOGO.md) | Categorías |
 | 9 | [`SESION_06_CART_ORDERS.md`](./SESION_06_CART_ORDERS.md) | Carrito y órdenes |
@@ -36,6 +37,7 @@ docs/
 ├── SESION_01_INSTALACION_FRONTEND.md
 ├── SESION_02_PRODUCTS_COMPLETO.md
 ├── SESION_03_AUTH_USERS_JWT.md
+├── Hotfix Monorepo.md
 ├── SESION_04_RBAC_RUTAS_PRIVADAS.md
 ├── SESION_05_CATEGORIES_CATALOGO.md
 ├── SESION_06_CART_ORDERS.md
