@@ -1,98 +1,76 @@
-# AulaPlan AI — Git y GitHub Workflow
+# 03 — Git y GitHub Workflow
 
-## Estrategia
+## Repositorio
 
-Se utilizará un repositorio remoto único y ramas cortas por sesión.
+Un repositorio GitHub contiene frontend, API serverless, contratos, Firebase y documentación.
+
+## Ramas sugeridas
 
 ```text
 main
-├── feature/sesion-01-foundation
-├── feature/sesion-02-fastapi
-├── feature/sesion-03-firebase
-├── feature/sesion-04-academic-core
-├── feature/sesion-05-resources
-├── feature/sesion-06-constraints
-├── feature/sesion-07-auth
-├── feature/sesion-08-scheduling-domain
-├── feature/sesion-09-ortools
-├── feature/sesion-10-optimization
-├── feature/sesion-11-ai
-├── feature/sesion-12-generation
-├── feature/sesion-13-testing
-└── feature/sesion-14-cicd
+├── feature/session-01-foundation
+├── feature/session-02-functions
+├── feature/session-03-firebase
+├── feature/session-04-academic-core
+├── feature/session-05-resources
+├── feature/session-06-constraints
+├── feature/session-07-auth
+├── feature/session-08-domain
+├── feature/session-09-backtracking
+├── feature/session-10-scoring
+├── feature/session-11-ai
+├── feature/session-12-versioning
+├── test/session-13-qa
+└── ci/session-14-netlify
 ```
 
-## Inicio de una sesión
+## Inicio de sesión
 
 ```bash
 git switch main
 git pull
-git switch -c feature/sesion-XX-descripcion
-```
-
-## Durante el trabajo
-
-```bash
-git status
-git diff
+git switch -c feature/session-XX-topic
 ```
 
 ## Cierre
 
 ```bash
+git status
 git add .
-git commit -m "feat: complete session XX"
-git push -u origin feature/sesion-XX-descripcion
+git commit -m "feat: complete session XX topic"
+git push -u origin feature/session-XX-topic
 ```
-
-Crear Pull Request y fusionar únicamente cuando el checklist de sesión esté en verde.
 
 ## Convención de commits
 
-| Prefijo | Uso |
-| --- | --- |
-| `chore:` | configuración |
-| `feat:` | funcionalidad |
-| `fix:` | corrección |
-| `test:` | pruebas |
-| `docs:` | documentación |
-| `refactor:` | reorganización sin cambiar comportamiento |
-| `ci:` | integración/despliegue |
+- `feat:` funcionalidad.
+- `fix:` corrección.
+- `refactor:` reorganización sin cambio funcional.
+- `test:` pruebas.
+- `docs:` documentación.
+- `chore:` configuración.
+- `ci:` automatización.
 
-## Tags del curso
-
-```bash
-git tag -a v0.1.0 -m "Foundation"
-git push origin v0.1.0
-```
-
-Propuesta:
-
-| Tag | Hito |
-| --- | --- |
-| `v0.1.0` | Foundation |
-| `v0.2.0` | Firebase |
-| `v0.3.0` | Academic Core |
-| `v0.4.0` | Auth |
-| `v0.5.0` | Scheduling |
-| `v0.6.0` | AI |
-| `v1.0.0` | Producción |
-
-## Archivos prohibidos
-
-Nunca deben aparecer en Git:
+## Versiones sugeridas
 
 ```text
-.env
-.env.*
-!.env.example
-.venv/
-node_modules/
-service-account*.json
-firebase-adminsdk*.json
-.nuxt/
-.output/
-coverage/
-.pytest_cache/
-__pycache__/
+v0.1.0 foundation
+v0.2.0 firebase
+v0.3.0 academic-core
+v0.4.0 auth-rbac
+v0.5.0 scheduler
+v0.6.0 ai
+v0.9.0 qa
+v1.0.0 production
 ```
+
+## Pull Request
+
+Cada PR debe documentar:
+
+1. objetivo;
+2. archivos principales;
+3. endpoint o flujo agregado;
+4. evidencia de prueba;
+5. variables nuevas;
+6. riesgos o deuda técnica.

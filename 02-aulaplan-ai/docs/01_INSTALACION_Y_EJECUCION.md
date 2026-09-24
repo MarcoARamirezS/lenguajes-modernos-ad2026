@@ -1,28 +1,21 @@
-# AulaPlan AI — Instalación y ejecución
-
-Esta guía concentra los prerrequisitos, comandos de creación y forma de ejecutar el proyecto en **macOS, Linux y Windows PowerShell**.
+# 01 — Instalación y ejecución
 
 ## Versiones de trabajo
 
-| Herramienta | Versión objetivo |
-| --- | --- |
-| Node.js | 24 LTS |
-| npm | incluida con Node |
-| Python | 3.12 |
-| Git | versión estable actual |
-| Java | JDK 21 |
-| Firebase CLI | versión estable actual |
+- Node.js: **24 LTS**.
+- npm: incluido con Node.
+- Git: versión estable actual.
+- Firebase CLI: dependencia de desarrollo del monorepo.
+- Netlify CLI: dependencia de desarrollo del monorepo.
 
-## Verificación
+## Verificar herramientas
 
 ### macOS / Linux
 
 ```bash
 node --version
 npm --version
-python3 --version
 git --version
-java --version
 ```
 
 ### Windows PowerShell
@@ -30,12 +23,10 @@ java --version
 ```powershell
 node --version
 npm --version
-py --version
 git --version
-java --version
 ```
 
-## Crear raíz del monorepo
+## Crear carpeta
 
 ### macOS / Linux
 
@@ -44,29 +35,35 @@ mkdir aulaplan-ai
 cd aulaplan-ai
 git init
 npm init -y
-npm pkg set private=true --json
-npm pkg set "workspaces[0]=apps/web"
-mkdir -p apps/api firebase docs .github/workflows
+mkdir -p apps/web apps/api/netlify/functions apps/api/src packages/contracts/src firebase docs .github/workflows
 ```
 
 ### Windows PowerShell
 
 ```powershell
-mkdir aulaplan-ai
-cd aulaplan-ai
+New-Item -ItemType Directory -Force aulaplan-ai | Out-Null
+Set-Location aulaplan-ai
 git init
 npm init -y
+New-Item -ItemType Directory -Force apps/web | Out-Null
+New-Item -ItemType Directory -Force apps/api/netlify/functions | Out-Null
+New-Item -ItemType Directory -Force apps/api/src | Out-Null
+New-Item -ItemType Directory -Force packages/contracts/src | Out-Null
+New-Item -ItemType Directory -Force firebase | Out-Null
+New-Item -ItemType Directory -Force docs | Out-Null
+New-Item -ItemType Directory -Force .github/workflows | Out-Null
+```
+
+## Configurar workspaces
+
+Desde la raíz:
+
+```bash
 npm pkg set private=true --json
-npm pkg set "workspaces[0]=apps/web"
-New-Item -ItemType Directory -Force apps/api
-New-Item -ItemType Directory -Force firebase
-New-Item -ItemType Directory -Force docs
-New-Item -ItemType Directory -Force .github/workflows
+npm pkg set "workspaces[0]=apps/*" "workspaces[1]=packages/*"
 ```
 
 ## Crear Nuxt 4
-
-Desde la raíz:
 
 ```bash
 npm create nuxt@latest apps/web
@@ -74,180 +71,185 @@ npm create nuxt@latest apps/web
 
 Seleccionar `npm` como package manager.
 
-## Crear entorno Python
-
-### macOS / Linux
+## Crear paquetes backend
 
 ```bash
 cd apps/api
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-pip install "fastapi[standard]"
+npm init -y
+cd ../..
+
+cd packages/contracts
+npm init -y
 cd ../..
 ```
 
-### Windows PowerShell
-
-```powershell
-cd apps/api
-py -3.12 -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-pip install "fastapi[standard]"
-cd ../..
-```
-
-Si PowerShell bloquea la activación:
-
-```powershell
-Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
-```
-
-## Dependencias backend finales
-
-Archivo `apps/api/requirements.txt`:
-
-```txt
-fastapi[standard]
-firebase-admin
-pydantic-settings
-ortools
-google-genai
-httpx
-```
-
-Archivo `apps/api/requirements-dev.txt`:
-
-```txt
--r requirements.txt
-pytest
-pytest-asyncio
-ruff
-```
-
-Instalar:
+## Dependencias del backend serverless
 
 ```bash
-cd apps/api
-pip install -r requirements-dev.txt
+npm install --workspace apps/api @netlify/functions firebase-admin zod @google/genai
+npm install --workspace apps/api -D typescript vitest @types/node
 ```
 
-## Variables de entorno backend
-
-Archivo `apps/api/.env.example`:
-
-```env
-APP_NAME=AulaPlan AI API
-APP_ENV=development
-API_PREFIX=/api/v1
-CORS_ORIGINS=http://localhost:3000
-FIREBASE_PROJECT_ID=your-project-id
-GOOGLE_APPLICATION_CREDENTIALS=/absolute/path/service-account.json
-GEMINI_API_KEY=replace-me
-GEMINI_MODEL=replace-with-current-free-tier-model
-```
-
-Nunca subir `.env` ni el JSON de la cuenta de servicio.
-
-## Variables frontend
-
-`apps/web/.env.example`:
-
-```env
-NUXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000/api/v1
-NUXT_PUBLIC_FIREBASE_API_KEY=replace-me
-NUXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
-NUXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
-NUXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.firebasestorage.app
-NUXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=replace-me
-NUXT_PUBLIC_FIREBASE_APP_ID=replace-me
-```
-
-## Ejecutar backend
-
-Terminal 1:
-
-### macOS / Linux
+## Dependencias frontend
 
 ```bash
-cd apps/api
-source .venv/bin/activate
-fastapi dev app/main.py
+npm install --workspace apps/web @pinia/nuxt pinia firebase
+npm install --workspace apps/web -D tailwindcss @tailwindcss/vite daisyui
 ```
 
-### Windows
+## Herramientas de proyecto
 
-```powershell
-cd apps/api
-.\.venv\Scripts\Activate.ps1
-fastapi dev app/main.py
+```bash
+npm install -D netlify-cli firebase-tools concurrently
 ```
 
-Abrir:
+## Ejecución recomendada
+
+La ejecución integrada debe realizarse desde raíz:
+
+```bash
+npx netlify dev
+```
+
+URL esperada:
 
 ```text
-http://127.0.0.1:8000/docs
+http://localhost:8888
 ```
 
-## Ejecutar frontend
-
-Terminal 2, desde raíz:
-
-```bash
-npm run dev --workspace apps/web
-```
-
-Abrir:
+API:
 
 ```text
-http://localhost:3000
+http://localhost:8888/api/health
 ```
 
-## Firebase CLI
+## Firebase Emulators
+
+Después de inicializar Firebase:
 
 ```bash
-npm install -g firebase-tools
-firebase --version
-firebase login
+npx firebase emulators:start
 ```
 
-La inicialización completa se realiza en la sesión 03.
+Puertos recomendados:
 
-## Git inicial
+- Emulator UI: `4000`.
+- Auth: `9099`.
+- Firestore: `8080`.
+
+## Comandos de validación
 
 ```bash
-git add .
-git commit -m "chore: initialize AulaPlan AI monorepo"
-git branch -M main
+npm run typecheck
+npm run lint
+npm run test
+npm run generate:web
 ```
 
-Con GitHub CLI:
+## Regla
+
+Durante el curso no se ejecutará un segundo backend en otro proveedor. La API existe como Netlify Functions dentro del mismo monorepo.
+
+## Configuración reproducible de la raíz
+
+Después de crear los workspaces, ejecutar:
 
 ```bash
-gh repo create aulaplan-ai --public --source=. --remote=origin --push
+npm pkg set name="aulaplan-ai"
+npm pkg set scripts.dev="netlify dev"
+npm pkg set scripts.dev:web="npm run dev --workspace @aulaplan/web"
+npm pkg set scripts.generate:web="npm run generate --workspace @aulaplan/web"
+npm pkg set scripts.typecheck="npm run typecheck --workspace @aulaplan/api && npm run typecheck --workspace @aulaplan/web"
+npm pkg set scripts.test="npm run test --workspace @aulaplan/api"
 ```
 
-Sin GitHub CLI:
+En `apps/web/package.json` ajustar el nombre:
 
 ```bash
-git remote add origin https://github.com/USUARIO/aulaplan-ai.git
-git push -u origin main
+npm pkg set name="@aulaplan/web" --workspace apps/web
 ```
 
-## Diagnóstico rápido
+En `apps/api/package.json`:
 
-| Síntoma | Revisión |
-| --- | --- |
-| `python` no existe | usar `python3` o `py -3.12` |
-| `fastapi` no existe | activar `.venv` |
-| Nuxt no inicia | `npm install` en raíz |
-| Firebase CLI no existe | reinstalar `firebase-tools` global |
-| Emulator no inicia | verificar JDK 21 |
-| CORS | revisar `CORS_ORIGINS` |
+```bash
+npm pkg set name="@aulaplan/api" --workspace apps/api
+npm pkg set private=true --json --workspace apps/api
+npm pkg set type="module" --workspace apps/api
+npm pkg set scripts.typecheck="tsc --noEmit" --workspace apps/api
+npm pkg set scripts.test="vitest run" --workspace apps/api
+npm pkg set scripts.test:watch="vitest" --workspace apps/api
+```
 
-## Navegación
+En `packages/contracts/package.json`:
 
-- [Mapa](./00_MAPA_DEL_PROYECTO.md)
-- [Frontend](./02_FRONTEND_NUXT4_ENTREGA_UNICA.md)
-- [Sesión 01](./SESION_01_FOUNDATION_MONOREPO.md)
+```bash
+npm pkg set name="@aulaplan/contracts" --workspace packages/contracts
+npm pkg set private=true --json --workspace packages/contracts
+npm pkg set type="module" --workspace packages/contracts
+```
+
+## `.nvmrc`
+
+Archivo raíz:
+
+```text
+24
+```
+
+## `netlify.toml`
+
+Archivo raíz:
+
+```toml
+[build]
+  command = "npm run generate:web"
+  publish = "apps/web/.output/public"
+  functions = "apps/api/netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "24"
+
+[dev]
+  command = "npm run dev:web"
+  targetPort = 3000
+  port = 8888
+  autoLaunch = false
+
+[functions]
+  node_bundler = "esbuild"
+```
+
+## `apps/api/tsconfig.json`
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true,
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts", "netlify/functions/**/*.mts", "tests/**/*.ts"]
+}
+```
+
+## `.gitignore` mínimo
+
+```gitignore
+node_modules/
+.nuxt/
+.output/
+.netlify/
+coverage/
+.env
+.env.*
+!.env.example
+service-account*.json
+firebase-adminsdk*.json
+.DS_Store
+```

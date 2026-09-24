@@ -1,114 +1,142 @@
-# Sesión 13 — Testing y QA
+# 13 — Testing y QA
 
-**Duración:** 1 hora 30 minutos  
-**Proyecto:** AulaPlan AI
+**Duración:** 1 hora 30 minutos.
 
 ## Objetivo
 
-Crear una pirámide de pruebas para schemas, servicios, API y solver; utilizar emuladores para evitar depender de Firebase productivo.
-
-## Resultado esperado
-
-La suite cubre reglas críticas de conflicto y los endpoints principales pueden ejecutarse automáticamente.
+Crear una pirámide de pruebas enfocada en reglas del scheduler, API serverless, Firebase Emulator y flujos E2E.
 
 ## Distribución de tiempo
 
-| Tiempo | Actividad |
-| --- | --- |
-| 00–15 | Estrategia |
-| 15–30 | Pytest |
-| 30–50 | Solver unit tests |
-| 50–65 | API tests |
-| 65–78 | Firebase Emulator |
-| 78–90 | Playwright smoke |
+- **00–20 min** — Test strategy
+- **20–45 min** — Unit scheduler
+- **45–60 min** — API
+- **60–75 min** — Emulator integration
+- **75–90 min** — Playwright
 
-## Instalar
+## Conceptos
 
-```bash
-pip install pytest pytest-asyncio httpx ruff
-```
+- unit tests
+- integration tests
+- Firebase Emulator
+- API contract
+- E2E
 
-## Estructura
+## Desarrollo
 
-```text
-apps/api/tests/
-├── conftest.py
-├── unit/
-│   ├── test_constraints.py
-│   └── test_solver.py
-├── integration/
-│   └── test_teacher_repository.py
-└── api/
-    ├── test_health.py
-    └── test_schedules.py
-```
+### 1. Unit
 
-## Health
+Probar capacidad, disponibilidad, conflictos, apply/rollback, scoring, deadline y heurísticas.
 
-```python
-from fastapi.testclient import TestClient
-from app.main import app
+### 2. API
 
-client = TestClient(app)
+Invocar router con `Request` reales construidos en test. Validar status, headers y error envelope.
 
+### 3. Firebase
 
-def test_health_returns_ok():
-    response = client.get("/api/v1/health")
-    assert response.status_code == 200
-    assert response.json()["status"] == "ok"
-```
+Ejecutar repositories contra Firestore Emulator. Limpiar datos entre suites.
 
-## Casos obligatorios del solver
+### 4. Auth
 
-- mismo profesor en dos clases;
-- mismo grupo en dos clases;
-- mismo salón en dos clases;
-- capacidad insuficiente;
-- tipo de salón incompatible;
-- profesor no disponible;
-- dataset factible;
-- dataset inviable;
-- soft constraints no rompen hard constraints.
+Cubrir 401/403 y roles permitidos. Usar Emulator cuando el alcance lo permita.
 
-## Ejecutar
+### 5. E2E
+
+Playwright: login → catálogos → restricciones → generar → revisar → publicar.
+
+### 6. Quality gate
+
+No hacer deploy si unit/API fallan. Mantener fixtures pequeños para CI.
+
+## Endpoints al cierre
+
+- `Todos los endpoints críticos`
+
+## Checklist de cierre
+
+- [ ] Scheduler unit tests verdes
+- [ ] Repositories contra Emulator verdes
+- [ ] Auth cases verdes
+- [ ] E2E crítico verde
+- [ ] No se requiere Firebase producción para CI
+
+## Commit sugerido
 
 ```bash
-cd apps/api
-pytest -q
-ruff check app tests
+git add .
+git commit -m "test: complete AulaPlan AI quality gates"
 ```
 
-## E2E frontend
+## Configuración Vitest
 
-Mantener un smoke corto:
+### `apps/api/vitest.config.ts`
+
+```ts
+import { defineConfig } from 'vitest/config'
+
+export default defineConfig({
+  test: {
+    environment: 'node',
+    include: ['tests/**/*.test.ts'],
+    clearMocks: true
+  }
+})
+```
+
+## Test del router
+
+```ts
+import { describe, expect, it } from 'vitest'
+import { handleApiRequest } from '../src/app'
+
+describe('system routes', () => {
+  it('GET /api/health returns ok', async () => {
+    const req = new Request('http://localhost/api/health')
+    const response = await handleApiRequest(req)
+
+    expect(response.status).toBe(200)
+    expect(await response.json()).toEqual({
+      status: 'ok',
+      service: 'aulaplan-api'
+    })
+  })
+})
+```
+
+## Test de regla dura
+
+```ts
+import { describe, expect, it } from 'vitest'
+
+it('does not allow the same teacher in the same time block', () => {
+  const busy = new Set(['teacher-1:block-1'])
+  expect(busy.has('teacher-1:block-1')).toBe(true)
+})
+```
+
+En el código real probar `canPlace` como función exportable/pura o mediante un módulo de reglas, no copiando la lógica dentro del test.
+
+## CI con emuladores
+
+Para integration tests usar Firebase Emulator Suite. La suite no debe depender de Firestore producción.
+
+Comando sugerido:
+
+```bash
+npx firebase emulators:exec --config firebase/firebase.json --only auth,firestore "npm run test --workspace @aulaplan/api"
+```
+
+## E2E
+
+Playwright debe cubrir solo el camino de mayor valor:
 
 ```text
 login
-→ dashboard
-→ teachers
-→ generator
-→ schedules
+→ teacher/subject/group demo
+→ constraint
+→ generate
+→ review
+→ publish
 ```
 
-No convertir E2E en sustituto de las pruebas del solver.
-
-
-## Cierre de sesión
-
-```bash
-git status
-git add .
-git commit -m "test: add backend and scheduling test suite"
-```
-
-## Checklist
-
-- [ ] La funcionalidad principal de la sesión funciona.
-- [ ] No existen secretos versionados.
-- [ ] Los endpoints nuevos aparecen en `/docs` cuando aplica.
-- [ ] La documentación coincide con el código.
-- [ ] Se realizó el commit de cierre.
-
-## Navegación
-
-- [Índice de documentación](./README.md)
+[Volver al índice](./README.md)

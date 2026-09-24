@@ -1,85 +1,88 @@
-# AulaPlan AI — Contrato API REST
+# 05 — Contrato API
 
-Base local:
+Base:
 
 ```text
-http://127.0.0.1:8000/api/v1
+/api
 ```
-
-## Convenciones
-
-- JSON UTF-8.
-- IDs como `string`.
-- Fechas ISO-8601.
-- `Authorization: Bearer <Firebase ID Token>` en rutas privadas.
-- Respuestas de error consistentes.
 
 ## Health
 
 ```text
-GET /health
+GET /api/health
+GET /api/info
 ```
 
-## Catálogos
+## Academic periods
 
 ```text
-GET    /academic-periods
-POST   /academic-periods
-GET    /academic-periods/{id}
-PATCH  /academic-periods/{id}
-DELETE /academic-periods/{id}
-
-GET    /teachers
-POST   /teachers
-GET    /teachers/{id}
-PATCH  /teachers/{id}
-DELETE /teachers/{id}
-
-GET    /subjects
-POST   /subjects
-GET    /subjects/{id}
-PATCH  /subjects/{id}
-DELETE /subjects/{id}
-
-GET    /groups
-POST   /groups
-GET    /groups/{id}
-PATCH  /groups/{id}
-DELETE /groups/{id}
-
-GET    /rooms
-POST   /rooms
-GET    /rooms/{id}
-PATCH  /rooms/{id}
-DELETE /rooms/{id}
-
-GET    /time-blocks
-POST   /time-blocks
+GET    /api/academic-periods
+POST   /api/academic-periods
+GET    /api/academic-periods/:id
+PUT    /api/academic-periods/:id
+DELETE /api/academic-periods/:id
 ```
 
-## Disponibilidad y restricciones
+## Teachers
 
 ```text
-GET  /availability/teachers/{teacherId}
-PUT  /availability/teachers/{teacherId}
-
-GET    /constraints
-POST   /constraints
-PATCH  /constraints/{id}
-DELETE /constraints/{id}
+GET    /api/teachers
+POST   /api/teachers
+GET    /api/teachers/:id
+PUT    /api/teachers/:id
+DELETE /api/teachers/:id
 ```
 
-## IA
+## Subjects / Groups / Rooms / Time blocks
+
+Se mantiene el mismo patrón REST.
+
+## Availability
 
 ```text
-POST /ai/constraints/parse
+GET  /api/teachers/:teacherId/availability
+PUT  /api/teachers/:teacherId/availability
+```
+
+## Constraints
+
+```text
+GET    /api/constraints
+POST   /api/constraints
+PUT    /api/constraints/:id
+DELETE /api/constraints/:id
+POST   /api/ai/constraints/parse
+```
+
+## Validation
+
+```text
+POST /api/schedules/validate-input
+```
+
+Respuesta:
+
+```json
+{
+  "valid": false,
+  "errors": [],
+  "warnings": []
+}
+```
+
+## Generation
+
+```text
+POST /api/schedules/generate
 ```
 
 Request:
 
 ```json
 {
-  "text": "La profesora Ana no puede los martes y prefiere terminar antes de las 13:00"
+  "academicPeriodId": "period-1",
+  "maxSolverMs": 8000,
+  "seed": 42
 }
 ```
 
@@ -87,47 +90,45 @@ Response:
 
 ```json
 {
-  "constraints": [
-    {
-      "type": "TEACHER_UNAVAILABLE_DAY",
-      "severity": "HARD",
-      "targetId": "teacher-id",
-      "parameters": { "day": "TUESDAY" }
-    }
-  ],
-  "warnings": []
+  "scheduleVersionId": "...",
+  "status": "GENERATED",
+  "score": 870,
+  "hardViolations": 0,
+  "softViolations": 4
 }
 ```
 
-## Horarios
+## Publication
 
 ```text
-POST /schedules/generate
-GET  /schedules
-GET  /schedules/{id}
-POST /schedules/{id}/review
-POST /schedules/{id}/publish
-POST /schedules/{id}/archive
+GET  /api/schedules
+GET  /api/schedules/:id
+POST /api/schedules/:id/review
+POST /api/schedules/:id/publish
+POST /api/schedules/:id/archive
 ```
 
-## Respuesta de error
+## Error envelope
 
 ```json
 {
   "error": {
-    "code": "ROOM_CAPACITY_INVALID",
-    "message": "El salón no tiene capacidad suficiente.",
-    "details": {}
+    "code": "VALIDATION_ERROR",
+    "message": "Invalid request",
+    "details": []
   }
 }
 ```
 
-## OpenAPI
+## Códigos
 
-FastAPI genera:
-
-```text
-/docs
-/redoc
-/openapi.json
-```
+- `200` lectura/actualización correcta.
+- `201` creado.
+- `204` eliminado.
+- `400` request inválido.
+- `401` token ausente/inválido.
+- `403` rol insuficiente.
+- `404` recurso inexistente.
+- `409` conflicto de negocio.
+- `422` restricciones semánticamente inválidas.
+- `500` error inesperado.

@@ -1,98 +1,137 @@
-# Sesión 12 — Generación E2E, versionado y publicación
+# 12 — Generación, versiones y publicación
 
-**Duración:** 1 hora 30 minutos  
-**Proyecto:** AulaPlan AI
+**Duración:** 1 hora 30 minutos.
 
 ## Objetivo
 
-Unir repositorios, problem builder, solver y persistencia para cerrar el flujo de negocio de generación de horarios.
-
-## Resultado esperado
-
-El usuario genera una nueva versión, la revisa y puede publicarla sin sobrescribir versiones anteriores.
+Convertir el solver en un flujo de negocio completo con versiones inmutables, revisión y publicación.
 
 ## Distribución de tiempo
 
-| Tiempo | Actividad |
-| --- | --- |
-| 00–15 | Orquestación |
-| 15–35 | ScheduleService |
-| 35–50 | Persistencia |
-| 50–65 | Estados |
-| 65–80 | Conectar Nuxt |
-| 80–90 | Flujo E2E |
+- **00–15 min** — Lifecycle
+- **15–35 min** — Persistencia
+- **35–55 min** — Versioning
+- **55–75 min** — Review/publish
+- **75–90 min** — Audit
 
-## Estados
+## Conceptos
 
-```text
-DRAFT
-GENERATED
-REVIEWED
-PUBLISHED
-ARCHIVED
+- immutable versions
+- status transitions
+- transactional thinking
+- auditability
+
+## Desarrollo
+
+### 1. Guardar versión
+
+Cada ejecución exitosa crea `scheduleVersions` y sus `scheduleEntries`. No sobrescribir una versión anterior.
+
+### 2. Estados
+
+Permitir transiciones válidas `GENERATED → REVIEWED → PUBLISHED → ARCHIVED`.
+
+### 3. Publicación única
+
+Cuando se publica una versión, definir claramente qué ocurre con la versión publicada anterior del mismo periodo.
+
+### 4. Auditoría
+
+Registrar actor, timestamp, versión, acción y metadatos relevantes sin almacenar tokens.
+
+### 5. Frontend
+
+Conectar comparación de versiones, score y botón de publicación al contrato real.
+
+## Endpoints al cierre
+
+- `GET /api/schedules`
+- `GET /api/schedules/:id`
+- `POST /api/schedules/:id/review`
+- `POST /api/schedules/:id/publish`
+- `POST /api/schedules/:id/archive`
+
+## Checklist de cierre
+
+- [ ] Versiones son inmutables
+- [ ] Transiciones inválidas regresan 409
+- [ ] Solo rol permitido publica
+- [ ] Auditoría creada
+- [ ] Frontend muestra versión publicada
+
+## Commit sugerido
+
+```bash
+git add .
+git commit -m "feat: implement schedule versioning and publication"
+```
+
+## Persistencia de versiones
+
+### Estado
+
+```ts
+export type ScheduleStatus =
+  | 'GENERATED'
+  | 'REVIEWED'
+  | 'PUBLISHED'
+  | 'ARCHIVED'
+```
+
+### Generación
+
+El service debe:
+
+1. cargar `ScheduleProblem` desde repositories;
+2. validar preflight;
+3. ejecutar solver con `MAX_SOLVER_MS` limitado;
+4. rechazar si no existe solución válida;
+5. crear un documento `scheduleVersions`;
+6. guardar `scheduleEntries` asociados;
+7. devolver métricas y versión.
+
+Ejemplo de documento:
+
+```ts
+const version = {
+  academicPeriodId,
+  version: nextVersion,
+  status: 'GENERATED',
+  score: result.score,
+  hardViolations: 0,
+  softViolations: result.softViolations,
+  solver: {
+    nodes: result.nodes,
+    elapsedMs: result.elapsedMs,
+    timedOut: result.timedOut
+  },
+  createdBy: user.uid,
+  createdAt: new Date().toISOString()
+}
 ```
 
 ## Transiciones
 
-```text
-GENERATED → REVIEWED → PUBLISHED → ARCHIVED
+```ts
+const allowedTransitions = {
+  GENERATED: ['REVIEWED', 'ARCHIVED'],
+  REVIEWED: ['PUBLISHED', 'ARCHIVED'],
+  PUBLISHED: ['ARCHIVED'],
+  ARCHIVED: []
+} as const
 ```
 
-No permitir `GENERATED → PUBLISHED` si la regla de negocio exige revisión.
-
-## `ScheduleService.generate()`
-
-Responsabilidades:
-
-1. Obtener periodo.
-2. Cargar catálogos activos.
-3. Cargar teaching assignments.
-4. Cargar disponibilidad.
-5. Cargar constraints.
-6. Construir `SchedulingProblem`.
-7. Prevalidar.
-8. Ejecutar solver.
-9. Construir resultado.
-10. Calcular siguiente versión.
-11. Guardar `schedule_versions`.
-12. Devolver DTO.
-
-## Versiones
-
-No usar `count + 1` sin protección conceptual. Para el curso, obtener `max(version)` dentro del periodo y documentar el riesgo de concurrencia; en una versión productiva se debe proteger el consecutivo con una transacción o contador atómico.
-
-## Frontend
-
-Habilitar botones de `/generator`:
-
-```text
-Interpretar IA → POST /ai/constraints/parse
-Generar       → POST /schedules/generate
-```
-
-En `/schedules` listar versiones y mostrar status, score y fecha.
+Si una transición no está permitida, responder `409 INVALID_SCHEDULE_TRANSITION`.
 
 ## Publicación
 
-Al publicar una versión, archivar la versión publicada previa del mismo periodo dentro de una operación controlada.
+Usar una transacción Firestore para:
 
+1. localizar la versión publicada actual del mismo periodo;
+2. archivarla si existe;
+3. marcar la nueva versión como `PUBLISHED`;
+4. registrar `publishedAt` y `publishedBy`.
 
-## Cierre de sesión
+De esta forma nunca existen dos versiones publicadas activas para el mismo periodo.
 
-```bash
-git status
-git add .
-git commit -m "feat: complete schedule generation workflow"
-```
-
-## Checklist
-
-- [ ] La funcionalidad principal de la sesión funciona.
-- [ ] No existen secretos versionados.
-- [ ] Los endpoints nuevos aparecen en `/docs` cuando aplica.
-- [ ] La documentación coincide con el código.
-- [ ] Se realizó el commit de cierre.
-
-## Navegación
-
-- [Índice de documentación](./README.md)
+[Volver al índice](./README.md)

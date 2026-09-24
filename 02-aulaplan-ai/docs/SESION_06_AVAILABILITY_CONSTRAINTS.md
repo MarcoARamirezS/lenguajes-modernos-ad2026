@@ -1,116 +1,145 @@
-# Sesión 06 — Disponibilidad y restricciones
+# 06 — Disponibilidad y restricciones
 
-**Duración:** 1 hora 30 minutos  
-**Proyecto:** AulaPlan AI
+**Duración:** 1 hora 30 minutos.
 
 ## Objetivo
 
-Representar disponibilidad docente, hard constraints y soft constraints de forma explícita y validable.
-
-## Resultado esperado
-
-El backend puede persistir disponibilidad y restricciones estructuradas listas para ser consumidas por el solver.
+Modelar reglas duras y blandas que después consumirá el scheduler.
 
 ## Distribución de tiempo
 
-| Tiempo | Actividad |
-| --- | --- |
-| 00–15 | Hard vs soft constraints |
-| 15–35 | Disponibilidad |
-| 35–55 | Constraint schema |
-| 55–70 | Endpoints |
-| 70–82 | Validación semántica |
-| 82–90 | Casos |
+- **00–20 min** — Hard vs soft
+- **20–40 min** — Availability
+- **40–60 min** — Constraint schema
+- **60–75 min** — CRUD
+- **75–90 min** — Casos
 
 ## Conceptos
 
-### Hard constraint
+- hard constraints
+- soft constraints
+- weights
+- scope
+- parameters
+- validation before persistence
 
-Si se viola, el horario no es válido.
+## Desarrollo
 
-Ejemplos:
+### 1. Disponibilidad
 
-- Profesor no disponible.
-- Grupo doblemente asignado.
-- Salón doblemente asignado.
-- Salón con capacidad insuficiente.
+Para cada profesor registrar disponibilidad por `timeBlockId` y una preferencia opcional.
 
-### Soft constraint
+### 2. Tipos de constraint
 
-Puede incumplirse, pero genera penalización.
+Definir un catálogo: `TEACHER_UNAVAILABLE`, `TEACHER_PREFERRED`, `ROOM_REQUIRED`, `MAX_CONSECUTIVE`, `MAX_DAILY_BLOCKS`, `AVOID_GAPS`.
 
-- Preferencia por mañana.
-- Evitar huecos.
-- Evitar última hora.
+### 3. Hard/soft
 
-## Schema sugerido
+`hard=true` invalida una solución; `hard=false` afecta score mediante `weight`.
 
-```python
-from enum import StrEnum
-from typing import Any
-from pydantic import BaseModel, Field
+### 4. Parameters
 
-class Severity(StrEnum):
-    HARD = "HARD"
-    SOFT = "SOFT"
+Validar el contenido de `parameters` según `type`; no aceptar objetos arbitrarios sin schema.
 
-class ConstraintCreate(BaseModel):
-    type: str
-    severity: Severity
-    weight: int = Field(default=1, ge=1, le=100)
-    target_type: str
-    target_id: str | None = None
-    parameters: dict[str, Any] = {}
-    active: bool = True
-```
+### 5. Casos de prueba
 
-## Endpoint de disponibilidad
+Agregar ejemplos que puedan ser imposibles para preparar la siguiente fase de diagnóstico.
 
-```text
-GET /availability/teachers/{teacherId}
-PUT /availability/teachers/{teacherId}
-```
+## Endpoints al cierre
 
-El `PUT` reemplaza el conjunto completo para facilitar la UI tipo grid.
+- `GET/PUT /api/teachers/:teacherId/availability`
+- `GET/POST/PUT/DELETE /api/constraints`
 
-Request:
+## Checklist de cierre
 
-```json
-{
-  "availableTimeBlockIds": ["MON-01", "MON-02", "WED-01"]
-}
-```
+- [ ] Reglas duras diferenciadas
+- [ ] Weights para reglas blandas
+- [ ] Parámetros validados
+- [ ] Restricciones imposibles representables
 
-## Constraint catalog inicial
-
-```text
-TEACHER_UNAVAILABLE_DAY
-TEACHER_PREFERRED_END
-ROOM_REQUIRED
-MAX_CONSECUTIVE_BLOCKS
-MAX_DAILY_BLOCKS
-GROUP_NO_GAPS
-```
-
-No aceptar un `type` desconocido silenciosamente; validar contra un catálogo.
-
-
-## Cierre de sesión
+## Commit sugerido
 
 ```bash
-git status
 git add .
 git commit -m "feat: implement availability and constraints"
 ```
 
-## Checklist
+## Schemas de restricciones
 
-- [ ] La funcionalidad principal de la sesión funciona.
-- [ ] No existen secretos versionados.
-- [ ] Los endpoints nuevos aparecen en `/docs` cuando aplica.
-- [ ] La documentación coincide con el código.
-- [ ] Se realizó el commit de cierre.
+### `availability.schema.ts`
 
-## Navegación
+```ts
+import { z } from 'zod'
 
-- [Índice de documentación](./README.md)
+export const availabilityRuleSchema = z.object({
+  teacherId: z.string().min(1),
+  academicPeriodId: z.string().min(1),
+  timeBlockId: z.string().min(1),
+  available: z.boolean(),
+  preferenceWeight: z.number().int().min(-100).max(100).default(0)
+})
+```
+
+### `constraint.schema.ts`
+
+```ts
+import { z } from 'zod'
+
+export const constraintTypeSchema = z.enum([
+  'TEACHER_UNAVAILABLE',
+  'TEACHER_PREFERRED',
+  'ROOM_REQUIRED',
+  'MAX_CONSECUTIVE',
+  'MAX_DAILY_BLOCKS',
+  'AVOID_GAPS'
+])
+
+export const constraintSchema = z.object({
+  academicPeriodId: z.string().min(1),
+  type: constraintTypeSchema,
+  scope: z.enum(['GLOBAL', 'TEACHER', 'GROUP', 'SUBJECT', 'ROOM']),
+  targetId: z.string().nullable().default(null),
+  hard: z.boolean(),
+  weight: z.number().int().min(0).max(100).default(10),
+  parameters: z.record(z.string(), z.unknown()).default({}),
+  active: z.boolean().default(true)
+})
+```
+
+## Validación semántica
+
+Después de Zod, agregar una función por tipo. Ejemplo:
+
+```ts
+import { AppError } from '../../core/errors'
+
+export function validateConstraint(input: {
+  type: string
+  targetId: string | null
+  parameters: Record<string, unknown>
+}) {
+  if (input.type === 'MAX_CONSECUTIVE') {
+    const value = input.parameters.maxBlocks
+
+    if (!Number.isInteger(value) || Number(value) < 1) {
+      throw new AppError(
+        422,
+        'INVALID_CONSTRAINT_PARAMETERS',
+        'MAX_CONSECUTIVE requires a positive integer maxBlocks'
+      )
+    }
+  }
+
+  if (input.type.startsWith('TEACHER_') && !input.targetId) {
+    throw new AppError(
+      422,
+      'INVALID_CONSTRAINT_TARGET',
+      'Teacher constraints require targetId'
+    )
+  }
+}
+```
+
+Esto evita convertir `parameters` en una bolsa de datos sin contrato.
+
+[Volver al índice](./README.md)

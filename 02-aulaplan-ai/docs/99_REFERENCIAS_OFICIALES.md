@@ -1,52 +1,33 @@
-# AulaPlan AI — Referencias oficiales
+# 99 — Referencias oficiales
 
-Revisar estas fuentes antes de actualizar versiones o comandos.
+Validado para la arquitectura del curso el **23 de septiembre de 2026**.
+
+## Netlify
+
+- Functions — Getting started: https://docs.netlify.com/build/functions/get-started/
+- Functions configuration/routing: https://docs.netlify.com/build/functions/configuration/
+- Functions API reference: https://docs.netlify.com/build/functions/api/
+- Lambda compatibility / Go deprecation: https://docs.netlify.com/build/functions/lambda-compatibility/?fn-language=go
+- Monorepos/build configuration: https://docs.netlify.com/build/configure-builds/monorepos/
 
 ## Nuxt
 
-- https://nuxt.com/docs/4.x/getting-started/installation
-- https://nuxt.com/docs/4.x/getting-started/deployment
-
-## Tailwind CSS 4
-
-- https://tailwindcss.com/docs/installation/framework-guides/nuxt
-
-## daisyUI 5
-
-- https://daisyui.com/docs/install/
-- https://daisyui.com/tailwind-css/install-with-vite/
-
-## FastAPI
-
-- https://fastapi.tiangolo.com/
-- https://fastapi.tiangolo.com/tutorial/
+- Nuxt 4 installation: https://nuxt.com/docs/4.x/getting-started/installation
+- Deployment: https://nuxt.com/docs/4.x/getting-started/deployment
+- Netlify: https://nuxt.com/deploy/netlify
 
 ## Firebase
 
-- https://firebase.google.com/docs/admin/setup
-- https://firebase.google.com/docs/firestore
-- https://firebase.google.com/docs/auth
-- https://firebase.google.com/docs/emulator-suite
+- Admin SDK setup: https://firebase.google.com/docs/admin/setup
+- Authentication: https://firebase.google.com/docs/auth
+- Firestore: https://firebase.google.com/docs/firestore
+- Emulator Suite: https://firebase.google.com/docs/emulator-suite
 
-## OR-Tools
+## Gemini
 
-- https://developers.google.com/optimization
-- https://developers.google.com/optimization/scheduling
+- Getting started: https://ai.google.dev/gemini-api/docs/get-started
+- Google GenAI SDK migration/current SDK: https://ai.google.dev/gemini-api/docs/migrate
 
-## Gemini API
+## Nota de arquitectura
 
-- https://ai.google.dev/gemini-api/docs/get-started
-- https://ai.google.dev/gemini-api/docs/pricing
-- https://ai.google.dev/gemini-api/docs/rate-limits
-
-> El proyecto usa `GEMINI_MODEL` como variable de entorno para no acoplar el código del curso a un nombre de modelo que pueda cambiar.
-
-## Deploy
-
-- https://docs.netlify.com/
-- https://docs.netlify.com/build/configure-builds/monorepos/
-- https://render.com/docs/deploy-fastapi
-
-## GitHub Actions
-
-- https://docs.github.com/actions
+Aunque Netlify documenta Go Functions mediante compatibilidad AWS Lambda, ese modo está deprecated y Netlify indica que dejará de aceptar deploys en ese modo el **1 de julio de 2027**. Por eso AulaPlan AI usa Netlify Functions modernas en TypeScript.

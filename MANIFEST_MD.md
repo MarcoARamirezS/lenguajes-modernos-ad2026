@@ -1,4 +1,6 @@
-# Manifest de Markdown
+# MANIFEST_MD
+
+Archivos Markdown incluidos en esta entrega:
 
 - `01-ecommerce-monorepo/README.md`
 - `01-ecommerce-monorepo/docs/00_MAPA_DEL_PROYECTO.md`
@@ -20,21 +22,23 @@
 - `02-aulaplan-ai/docs/03_GIT_GITHUB_WORKFLOW.md`
 - `02-aulaplan-ai/docs/04_MODELO_FIRESTORE.md`
 - `02-aulaplan-ai/docs/05_CONTRATO_API.md`
+- `02-aulaplan-ai/docs/06_DECISION_ARQUITECTURA_NETLIFY.md`
+- `02-aulaplan-ai/docs/07_VARIABLES_ENTORNO_Y_SEGURIDAD.md`
+- `02-aulaplan-ai/docs/08_CHECKLIST_GLOBAL.md`
 - `02-aulaplan-ai/docs/99_REFERENCIAS_OFICIALES.md`
 - `02-aulaplan-ai/docs/README.md`
-- `02-aulaplan-ai/docs/SESION_01_FOUNDATION_MONOREPO.md`
-- `02-aulaplan-ai/docs/SESION_02_FASTAPI_ARQUITECTURA.md`
+- `02-aulaplan-ai/docs/SESION_01_FOUNDATION_MONOREPO_NETLIFY.md`
+- `02-aulaplan-ai/docs/SESION_02_NETLIFY_FUNCTIONS_ARQUITECTURA.md`
 - `02-aulaplan-ai/docs/SESION_03_FIREBASE_FIRESTORE.md`
 - `02-aulaplan-ai/docs/SESION_04_ACADEMIC_CORE.md`
 - `02-aulaplan-ai/docs/SESION_05_GROUPS_ROOMS_BLOCKS.md`
 - `02-aulaplan-ai/docs/SESION_06_AVAILABILITY_CONSTRAINTS.md`
 - `02-aulaplan-ai/docs/SESION_07_FIREBASE_AUTH_RBAC.md`
 - `02-aulaplan-ai/docs/SESION_08_SCHEDULING_DOMAIN.md`
-- `02-aulaplan-ai/docs/SESION_09_ORTOOLS_SOLVER.md`
-- `02-aulaplan-ai/docs/SESION_10_OPTIMIZACION_PREFERENCIAS.md`
+- `02-aulaplan-ai/docs/SESION_09_SCHEDULER_BACKTRACKING.md`
+- `02-aulaplan-ai/docs/SESION_10_SCHEDULER_HEURISTICS_SCORING.md`
 - `02-aulaplan-ai/docs/SESION_11_GEMINI_RESTRICCIONES.md`
 - `02-aulaplan-ai/docs/SESION_12_GENERACION_VERSIONADO.md`
 - `02-aulaplan-ai/docs/SESION_13_TESTING_QA.md`
-- `02-aulaplan-ai/docs/SESION_14_CICD_NETLIFY_RENDER.md`
-- `MANIFEST_MD.md`
+- `02-aulaplan-ai/docs/SESION_14_CICD_NETLIFY_GITHUB.md`
 - `README.md`

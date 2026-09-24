@@ -1,153 +1,161 @@
-# AulaPlan AI — Modelo Firestore
-
-## Principio
-
-Firestore almacenará datos operativos y versiones de horarios. OR-Tools trabaja en memoria con una representación del dominio; no se ejecutan búsquedas de Firestore dentro del ciclo interno del solver.
+# 04 — Modelo Firestore
 
 ## Colecciones
 
 ```text
 users
-academic_periods
+academicPeriods
 teachers
 subjects
 groups
 rooms
-time_blocks
-teacher_availability
+timeBlocks
+teachingAssignments
+availabilityRules
 constraints
-schedule_versions
+scheduleVersions
+scheduleEntries
+auditLogs
 ```
 
-## `teachers/{teacherId}`
+## users
 
 ```json
 {
-  "employeeNumber": "DOC-001",
-  "name": "María López",
-  "email": "maria@example.edu",
-  "active": true,
-  "createdAt": "serverTimestamp",
-  "updatedAt": "serverTimestamp"
-}
-```
-
-## `subjects/{subjectId}`
-
-```json
-{
-  "code": "LAC751",
-  "name": "Lenguajes Modernos",
-  "weeklyBlocks": 2,
-  "roomType": "COMPUTER_LAB",
+  "uid": "firebase-auth-uid",
+  "email": "coordinator@example.edu",
+  "displayName": "Coordinador",
+  "role": "COORDINATOR",
   "active": true
 }
 ```
 
-## `groups/{groupId}`
-
-```json
-{
-  "code": "LAC751-A",
-  "size": 28,
-  "academicPeriodId": "2026-AD",
-  "active": true
-}
-```
-
-## `rooms/{roomId}`
-
-```json
-{
-  "code": "LAB-03",
-  "name": "Laboratorio 3",
-  "capacity": 32,
-  "type": "COMPUTER_LAB",
-  "building": "B",
-  "active": true
-}
-```
-
-## `time_blocks/{blockId}`
-
-```json
-{
-  "day": "MONDAY",
-  "order": 1,
-  "start": "08:00",
-  "end": "09:30",
-  "active": true
-}
-```
-
-## `teacher_availability/{availabilityId}`
-
-```json
-{
-  "teacherId": "teacher-1",
-  "timeBlockId": "MON-01",
-  "available": true
-}
-```
-
-## `constraints/{constraintId}`
-
-```json
-{
-  "type": "TEACHER_PREFERRED_END",
-  "severity": "SOFT",
-  "weight": 10,
-  "targetType": "TEACHER",
-  "targetId": "teacher-1",
-  "parameters": {
-    "time": "13:00"
-  },
-  "active": true
-}
-```
-
-## `schedule_versions/{scheduleId}`
-
-```json
-{
-  "academicPeriodId": "2026-AD",
-  "version": 3,
-  "status": "GENERATED",
-  "solverStatus": "FEASIBLE",
-  "score": 820,
-  "createdBy": "firebase-uid",
-  "createdAt": "serverTimestamp",
-  "entries": [
-    {
-      "subjectId": "subject-1",
-      "teacherId": "teacher-1",
-      "groupId": "group-1",
-      "roomId": "room-1",
-      "timeBlockId": "MON-01"
-    }
-  ]
-}
-```
-
-## Índices esperados
-
-- `teachers`: `active + name`.
-- `subjects`: `active + code`.
-- `groups`: `academicPeriodId + active`.
-- `schedule_versions`: `academicPeriodId + version desc`.
-- `constraints`: `active + severity`.
-
-Los índices se agregan a `firebase/firestore.indexes.json` cuando una consulta real los requiera.
-
-## Regla de versionado
-
-Una versión publicada no se sobrescribe.
+Roles:
 
 ```text
-v1 GENERATED
-v2 REVIEWED
-v3 PUBLISHED
-v4 GENERATED
+ADMIN
+COORDINATOR
+VIEWER
 ```
 
-Si se requiere cambiar el horario, se crea una nueva versión.
+## academicPeriods
+
+Campos principales:
+
+- `name`.
+- `startDate`.
+- `endDate`.
+- `status`: `DRAFT | ACTIVE | CLOSED`.
+
+## teachers
+
+- `code`.
+- `name`.
+- `email`.
+- `active`.
+- `maxDailyBlocks`.
+- `maxWeeklyBlocks`.
+
+## subjects
+
+- `code`.
+- `name`.
+- `weeklyBlocks`.
+- `requiredRoomType`.
+- `active`.
+
+## groups
+
+- `code`.
+- `name`.
+- `studentCount`.
+- `academicPeriodId`.
+
+## rooms
+
+- `code`.
+- `name`.
+- `capacity`.
+- `type`.
+- `building`.
+- `active`.
+
+Tipos sugeridos:
+
+```text
+CLASSROOM
+LAB
+COMPUTER_LAB
+AUDITORIUM
+```
+
+## timeBlocks
+
+- `day`.
+- `startTime`.
+- `endTime`.
+- `order`.
+- `active`.
+
+## teachingAssignments
+
+Une:
+
+```text
+teacher + subject + group + academicPeriod
+```
+
+Campos:
+
+- `teacherId`.
+- `subjectId`.
+- `groupId`.
+- `weeklyBlocks`.
+- `preferredRoomType`.
+
+## availabilityRules
+
+- `teacherId`.
+- `day`.
+- `timeBlockId`.
+- `available`.
+- `preferenceWeight`.
+
+## constraints
+
+- `type`.
+- `scope`.
+- `targetId`.
+- `hard`.
+- `weight`.
+- `parameters`.
+
+## scheduleVersions
+
+- `academicPeriodId`.
+- `version`.
+- `status`.
+- `score`.
+- `hardViolations`.
+- `softViolations`.
+- `createdBy`.
+- `createdAt`.
+- `publishedAt`.
+
+## scheduleEntries
+
+- `scheduleVersionId`.
+- `assignmentId`.
+- `teacherId`.
+- `subjectId`.
+- `groupId`.
+- `roomId`.
+- `timeBlockId`.
+
+## Índices
+
+Crear índices compuestos solo cuando una consulta real los necesite. Registrar cada índice en `firebase/firestore.indexes.json` para que el proyecto sea reproducible.
+
+## Regla de acceso
+
+El frontend no escribe estas colecciones de negocio directamente. Las escrituras pasan por `/api/*`, donde Firebase Admin aplica autorización y validación.

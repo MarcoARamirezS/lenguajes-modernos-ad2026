@@ -1,113 +1,144 @@
-# Sesión 05 — Grupos, salones y bloques horarios
+# 05 — Grupos, salones, bloques y asignaciones
 
-**Duración:** 1 hora 30 minutos  
-**Proyecto:** AulaPlan AI
+**Duración:** 1 hora 30 minutos.
 
 ## Objetivo
 
-Agregar recursos académicos que posteriormente se transformarán en variables y dominios del solver.
-
-## Resultado esperado
-
-Existen grupos asociados a un periodo, salones tipados y bloques horarios ordenados por día.
+Completar los recursos que forman el espacio de búsqueda del generador de horarios.
 
 ## Distribución de tiempo
 
-| Tiempo | Actividad |
-| --- | --- |
-| 00–15 | Relaciones por ID |
-| 15–35 | Groups |
-| 35–55 | Rooms |
-| 55–70 | Time blocks |
-| 70–82 | Validaciones cruzadas |
-| 82–90 | Prueba |
+- **00–15 min** — Relaciones
+- **15–35 min** — Groups/Rooms
+- **35–55 min** — Time blocks
+- **55–75 min** — Assignments
+- **75–90 min** — Validación cruzada
 
-## Group
+## Conceptos
 
-Campos mínimos:
+- document references by id
+- capacity rules
+- room types
+- time block ordering
+- teaching assignments
 
-```json
-{
-  "code": "LAC751-A",
-  "size": 28,
-  "academicPeriodId": "period-id",
-  "active": true
-}
-```
+## Desarrollo
 
-## Room
+### 1. Groups
 
-Tipos válidos:
+Agregar `studentCount` y `academicPeriodId`. Rechazar grupos sin periodo válido.
 
-```python
-from enum import StrEnum
+### 2. Rooms
 
-class RoomType(StrEnum):
-    CLASSROOM = "CLASSROOM"
-    LAB = "LAB"
-    COMPUTER_LAB = "COMPUTER_LAB"
-    AUDITORIUM = "AUDITORIUM"
-```
+Agregar `capacity`, `type`, `building` y `active`. Validar capacidad positiva.
 
-Reglas:
+### 3. Time blocks
 
-- `capacity > 0`.
-- `code` único.
-- tipo conocido.
+Representar día, inicio, fin y orden. Evitar bloques duplicados dentro del mismo periodo.
 
-## TimeBlock
+### 4. Teaching assignments
 
-No almacenar una fecha; almacenar la posición semanal reutilizable:
+Relacionar profesor, materia y grupo. Definir carga semanal y tipo preferido/requerido de salón.
 
-```json
-{
-  "day": "MONDAY",
-  "order": 1,
-  "start": "08:00",
-  "end": "09:30",
-  "active": true
-}
-```
+### 5. Validación cruzada
 
-## Validaciones de servicio
+Antes de crear una asignación comprobar que todas las referencias existen y pertenecen al periodo correcto.
 
-Antes de crear un grupo:
+## Endpoints al cierre
 
-1. Verificar que `academicPeriodId` existe.
-2. Verificar código único dentro del periodo.
+- `/api/groups`
+- `/api/rooms`
+- `/api/time-blocks`
+- `/api/teaching-assignments`
 
-Antes de asignar un salón a una materia más adelante:
+## Checklist de cierre
 
-1. Capacidad del salón >= tamaño del grupo.
-2. Tipo del salón compatible con `roomType`.
+- [ ] Capacidad validada
+- [ ] Referencias inexistentes rechazadas
+- [ ] Bloques ordenables
+- [ ] Asignaciones listas para scheduling
 
-## Datos semilla manuales
-
-Crear al menos:
-
-- 2 grupos.
-- 3 salones.
-- 10 bloques horarios distribuidos en lunes y martes.
-
-Esto permite iniciar la sesión 08 sin depender de UI todavía.
-
-
-## Cierre de sesión
+## Commit sugerido
 
 ```bash
-git status
 git add .
-git commit -m "feat: implement groups rooms and time blocks"
+git commit -m "feat: implement academic resources"
 ```
 
-## Checklist
+## Schemas principales
 
-- [ ] La funcionalidad principal de la sesión funciona.
-- [ ] No existen secretos versionados.
-- [ ] Los endpoints nuevos aparecen en `/docs` cuando aplica.
-- [ ] La documentación coincide con el código.
-- [ ] Se realizó el commit de cierre.
+### Groups
 
-## Navegación
+```ts
+import { z } from 'zod'
 
-- [Índice de documentación](./README.md)
+export const groupSchema = z.object({
+  code: z.string().trim().min(2).max(30).transform(v => v.toUpperCase()),
+  name: z.string().trim().min(2).max(100),
+  studentCount: z.number().int().positive().max(500),
+  academicPeriodId: z.string().min(1),
+  active: z.boolean().default(true)
+})
+```
+
+### Rooms
+
+```ts
+import { z } from 'zod'
+
+export const roomSchema = z.object({
+  code: z.string().trim().min(2).max(30).transform(v => v.toUpperCase()),
+  name: z.string().trim().min(2).max(100),
+  capacity: z.number().int().positive().max(1000),
+  type: z.enum(['CLASSROOM', 'LAB', 'COMPUTER_LAB', 'AUDITORIUM']),
+  building: z.string().trim().min(1).max(100),
+  active: z.boolean().default(true)
+})
+```
+
+### Time blocks
+
+```ts
+import { z } from 'zod'
+
+const hhmm = /^([01]\d|2[0-3]):[0-5]\d$/
+
+export const timeBlockSchema = z.object({
+  academicPeriodId: z.string().min(1),
+  day: z.enum(['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY']),
+  startTime: z.string().regex(hhmm),
+  endTime: z.string().regex(hhmm),
+  order: z.number().int().nonnegative(),
+  active: z.boolean().default(true)
+}).refine(value => value.endTime > value.startTime, {
+  message: 'endTime must be later than startTime',
+  path: ['endTime']
+})
+```
+
+### Teaching assignments
+
+```ts
+import { z } from 'zod'
+
+export const teachingAssignmentSchema = z.object({
+  academicPeriodId: z.string().min(1),
+  teacherId: z.string().min(1),
+  subjectId: z.string().min(1),
+  groupId: z.string().min(1),
+  weeklyBlocks: z.number().int().positive().max(10),
+  preferredRoomType: z.enum([
+    'CLASSROOM',
+    'LAB',
+    'COMPUTER_LAB',
+    'AUDITORIUM'
+  ]).nullable().default(null),
+  active: z.boolean().default(true)
+})
+```
+
+## Regla importante del service
+
+Antes de crear `teachingAssignment`, cargar profesor, materia, grupo y periodo. Rechazar si cualquiera no existe, está inactivo o pertenece a un periodo incompatible. No dejar esta validación en el frontend.
+
+[Volver al índice](./README.md)

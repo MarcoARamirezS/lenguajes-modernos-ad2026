@@ -1,116 +1,147 @@
-# Sesión 07 — Firebase Authentication y RBAC
+# 07 — Firebase Authentication y RBAC
 
-**Duración:** 1 hora 30 minutos  
-**Proyecto:** AulaPlan AI
+**Duración:** 1 hora 30 minutos.
 
 ## Objetivo
 
-Autenticar usuarios con Firebase en Nuxt, verificar Firebase ID Tokens en FastAPI y aplicar roles en backend.
-
-## Resultado esperado
-
-Una ruta protegida devuelve 401 sin token, 403 sin permiso y 200 con usuario autorizado.
+Proteger la API verificando Firebase ID tokens y aplicando permisos en backend.
 
 ## Distribución de tiempo
 
-| Tiempo | Actividad |
-| --- | --- |
-| 00–15 | Flujo token |
-| 15–30 | Firebase Auth cliente |
-| 30–50 | Verify ID Token |
-| 50–65 | Dependency current_user |
-| 65–78 | RBAC |
-| 78–90 | Pruebas 401/403/200 |
+- **00–20 min** — Firebase Auth client
+- **20–40 min** — Bearer token
+- **40–60 min** — verifyIdToken
+- **60–75 min** — RBAC
+- **75–90 min** — Security tests
 
-## Flujo
+## Conceptos
 
-```text
-Nuxt login
-  ↓
-Firebase Auth
-  ↓
-ID Token
-  ↓
-Authorization: Bearer ...
-  ↓
-FastAPI
-  ↓
-firebase_admin.auth.verify_id_token
-```
+- ID token
+- Authorization header
+- token verification
+- RBAC
+- least privilege
 
-## Roles
+## Desarrollo
 
-```text
-ADMIN
-COORDINATOR
-VIEWER
-```
+### 1. Frontend login
 
-## `app/core/security.py`
+El frontend autentica con Firebase Web SDK y obtiene un ID token. El API client lo agrega como `Authorization: Bearer <token>`.
 
-```python
-from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from firebase_admin import auth
+### 2. Middleware funcional
 
-security = HTTPBearer(auto_error=False)
+Crear una función `requireAuth(req)` que valide encabezado, verifique el token con Firebase Admin y devuelva el principal autenticado.
 
+### 3. Roles
 
-def get_current_user(
-    credentials: HTTPAuthorizationCredentials | None = Depends(security),
-) -> dict:
-    if credentials is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing token")
-    try:
-        return auth.verify_id_token(credentials.credentials)
-    except Exception as exc:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token") from exc
+Usar `ADMIN`, `COORDINATOR`, `VIEWER`. El rol puede almacenarse como custom claim o resolverse de la colección `users`; documentar una sola fuente de verdad.
 
+### 4. Autorización
 
-def require_roles(*roles: str):
-    def dependency(user: dict = Depends(get_current_user)) -> dict:
-        role = user.get("role", "VIEWER")
-        if role not in roles:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
-        return user
-    return dependency
-```
+Crear `requireRole(user, allowedRoles)` y aplicarlo antes de mutaciones.
 
-## Claims
+### 5. Casos
 
-Para el ejercicio, el profesor puede asignar custom claims desde un script administrativo controlado. Nunca dar al cliente capacidad de asignarse su propio rol.
+401 sin token, 401 token inválido, 403 rol insuficiente, 200 rol permitido.
 
-## Matriz
+## Endpoints al cierre
 
-| Acción | ADMIN | COORDINATOR | VIEWER |
-| --- | --- | --- | --- |
-| Ver catálogos | Sí | Sí | Sí |
-| Editar catálogos | Sí | Sí | No |
-| Generar horario | Sí | Sí | No |
-| Publicar horario | Sí | No | No |
-| Administrar usuarios | Sí | No | No |
+- `POST/PUT/DELETE de catálogos protegidos`
+- `GET según política de lectura`
 
-## Frontend
+## Checklist de cierre
 
-`useApi()` ya agrega el Firebase ID Token; ahora las pantallas pueden comenzar a consumir rutas protegidas.
+- [ ] Token inválido rechazado
+- [ ] VIEWER no modifica
+- [ ] COORDINATOR administra planificación
+- [ ] ADMIN administra usuarios
+- [ ] Permisos no dependen del frontend
 
-
-## Cierre de sesión
+## Commit sugerido
 
 ```bash
-git status
 git add .
-git commit -m "feat: implement Firebase auth and RBAC"
+git commit -m "feat: implement Firebase authentication and RBAC"
 ```
 
-## Checklist
+## Código de autenticación
 
-- [ ] La funcionalidad principal de la sesión funciona.
-- [ ] No existen secretos versionados.
-- [ ] Los endpoints nuevos aparecen en `/docs` cuando aplica.
-- [ ] La documentación coincide con el código.
-- [ ] Se realizó el commit de cierre.
+### `apps/api/src/auth/auth.ts`
 
-## Navegación
+```ts
+import { auth, db } from '../firebase/admin'
+import { AppError } from '../core/errors'
 
-- [Índice de documentación](./README.md)
+export type Role = 'ADMIN' | 'COORDINATOR' | 'VIEWER'
+
+export type AuthenticatedUser = {
+  uid: string
+  email: string | null
+  role: Role
+}
+
+export async function requireAuth(req: Request): Promise<AuthenticatedUser> {
+  const header = req.headers.get('authorization')
+
+  if (!header?.startsWith('Bearer ')) {
+    throw new AppError(401, 'UNAUTHORIZED', 'Bearer token is required')
+  }
+
+  const token = header.slice('Bearer '.length)
+
+  let decoded
+  try {
+    decoded = await auth.verifyIdToken(token)
+  } catch {
+    throw new AppError(401, 'UNAUTHORIZED', 'Invalid or expired token')
+  }
+
+  const profile = await db.collection('users').doc(decoded.uid).get()
+
+  if (!profile.exists) {
+    throw new AppError(403, 'USER_PROFILE_NOT_FOUND', 'User profile is not configured')
+  }
+
+  const role = profile.get('role') as Role
+
+  if (!['ADMIN', 'COORDINATOR', 'VIEWER'].includes(role)) {
+    throw new AppError(403, 'INVALID_ROLE', 'User role is invalid')
+  }
+
+  return {
+    uid: decoded.uid,
+    email: decoded.email ?? null,
+    role
+  }
+}
+
+export function requireRole(user: AuthenticatedUser, allowed: Role[]) {
+  if (!allowed.includes(user.role)) {
+    throw new AppError(403, 'FORBIDDEN', 'Insufficient permissions')
+  }
+}
+```
+
+## Uso en una ruta
+
+```ts
+router.post('/teachers', async req => {
+  const user = await requireAuth(req)
+  requireRole(user, ['ADMIN', 'COORDINATOR'])
+
+  const input = createTeacherSchema.parse(await readJson(req))
+  return json(await teacherService.create(input), 201)
+})
+```
+
+## Política inicial
+
+| Acción | ADMIN | COORDINATOR | VIEWER |
+| --- | ---: | ---: | ---: |
+| Leer catálogos | Sí | Sí | Sí |
+| Modificar catálogos | Sí | Sí | No |
+| Generar horario | Sí | Sí | No |
+| Publicar | Sí | Sí | No |
+| Administrar usuarios | Sí | No | No |
+
+[Volver al índice](./README.md)

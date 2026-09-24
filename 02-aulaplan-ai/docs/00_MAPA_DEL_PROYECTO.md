@@ -1,139 +1,122 @@
-# AulaPlan AI — Mapa del Proyecto
+# 00 — Mapa del Proyecto AulaPlan AI
 
-## Objetivo
+## Problema
 
-Definir la estructura que deberá tener el monorepo técnico que el alumno construirá siguiendo las sesiones.
+Una institución necesita construir horarios considerando profesores, materias, grupos, aulas, disponibilidad, capacidad y preferencias. El sistema debe evitar conflictos y producir una solución explicable y versionable.
 
-## Repositorio guía vs. repositorio técnico
-
-Este directorio `02-aulaplan-ai` contiene **documentación didáctica**. Durante el curso se creará un repositorio técnico independiente llamado `aulaplan-ai`.
+## Flujo funcional
 
 ```text
-lenguajes-modernos-ad2026/          ← repositorio guía
-└── 02-aulaplan-ai/
-    └── docs/
-
-                    guía al alumno
-                           │
-                           ▼
-
-aulaplan-ai/                        ← repositorio técnico
-├── apps/web
-├── apps/api
-├── firebase
-├── docs
-└── .github
+Coordinador
+   ↓
+Configura periodo académico
+   ↓
+Registra profesores / materias / grupos / salones / bloques
+   ↓
+Captura disponibilidad y restricciones
+   ↓
+Solicita generación
+   ↓
+Scheduler
+   ├── valida hard constraints
+   ├── explora candidatos
+   ├── backtracking
+   ├── heurísticas
+   └── scoring
+   ↓
+Horario candidato
+   ↓
+Revisión
+   ↓
+Publicación
 ```
 
-## Estructura técnica objetivo
+## Flujo IA
 
 ```text
-aulaplan-ai/
-├── .github/
-│   └── workflows/
-│       ├── api-ci.yml
-│       └── web-ci.yml
-├── apps/
-│   ├── web/
-│   │   ├── app/
-│   │   │   ├── assets/css/
-│   │   │   ├── components/
-│   │   │   ├── composables/
-│   │   │   ├── layouts/
-│   │   │   ├── middleware/
-│   │   │   ├── pages/
-│   │   │   ├── plugins/
-│   │   │   ├── stores/
-│   │   │   └── types/
-│   │   ├── public/
-│   │   ├── nuxt.config.ts
-│   │   └── package.json
-│   └── api/
-│       ├── app/
-│       │   ├── api/v1/
-│       │   ├── ai/
-│       │   ├── core/
-│       │   ├── repositories/
-│       │   ├── schemas/
-│       │   ├── scheduling/
-│       │   ├── services/
-│       │   └── main.py
-│       ├── tests/
-│       ├── requirements.txt
-│       ├── requirements-dev.txt
-│       └── .python-version
-├── firebase/
-│   ├── firebase.json
-│   ├── firestore.indexes.json
-│   └── firestore.rules
-├── docs/
-├── .editorconfig
-├── .gitignore
-├── .nvmrc
-├── netlify.toml
-├── package.json
-├── README.md
-└── render.yaml
+Texto del coordinador
+"Ana no puede los martes y prefiere terminar antes de las 14:00"
+        ↓
+Gemini
+        ↓
+JSON estructurado
+        ↓
+Zod
+        ↓
+Confirmación humana
+        ↓
+Firestore
+        ↓
+Scheduler
 ```
 
-## Capas del backend
+La IA **interpreta** restricciones; no sustituye al motor determinista.
 
-```mermaid
-flowchart TD
-    R[Router] --> S[Schema Pydantic]
-    S --> SV[Service]
-    SV --> RP[Repository]
-    RP --> FS[(Firestore)]
-    SV --> SE[Scheduling Engine]
-    SV --> AI[AI Service]
-```
-
-## Regla de arquitectura
-
-El router no accede directamente a Firestore, OR-Tools o Gemini.
+## Arquitectura de despliegue
 
 ```text
-Router → Service → Repository → Firestore
-               ├→ Scheduling → OR-Tools
-               └→ AI Service → Gemini
+GitHub
+  ↓ push
+Netlify
+  ├── build Nuxt 4
+  │      └── apps/web/.output/public
+  └── build Functions
+         └── apps/api/netlify/functions/api.mts
+                    ↓
+                  /api/*
+                    ↓
+        Firebase Admin + Firestore + Gemini
 ```
 
-## Módulos del dominio
+## Módulos
 
-| Módulo | Responsabilidad |
-| --- | --- |
-| `health` | Estado de la API |
-| `academic_periods` | Periodos escolares |
-| `teachers` | Profesores |
-| `subjects` | Materias |
-| `groups` | Grupos |
-| `rooms` | Aulas y laboratorios |
-| `time_blocks` | Bloques disponibles |
-| `availability` | Disponibilidad docente |
-| `constraints` | Restricciones y preferencias |
-| `schedules` | Versiones de horario |
-| `auth` | Verificación de Firebase ID Tokens |
-| `ai` | Interpretación de lenguaje natural |
-| `scheduling` | Construcción y solución CP-SAT |
+1. Authentication.
+2. Dashboard.
+3. Academic periods.
+4. Teachers.
+5. Subjects.
+6. Groups.
+7. Rooms.
+8. Time blocks.
+9. Teaching assignments.
+10. Availability.
+11. Constraints.
+12. Scheduler.
+13. AI constraint parser.
+14. Schedule versions.
+15. Publication.
+16. Audit.
 
-## Flujo de generación
+## Hard constraints
 
-```mermaid
-flowchart TD
-    A[Solicitud de generación] --> B[Leer catálogos]
-    B --> C[Validar integridad]
-    C --> D[Construir modelo CP-SAT]
-    D --> E[Agregar hard constraints]
-    E --> F[Agregar soft constraints]
-    F --> G[Resolver]
-    G -->|Feasible/Optimal| H[Construir resultado]
-    G -->|Infeasible| I[Diagnóstico]
-    H --> J[Guardar nueva versión]
-    J --> K[Mostrar en Nuxt]
+- Un profesor no puede ocupar dos clases al mismo tiempo.
+- Un grupo no puede ocupar dos clases al mismo tiempo.
+- Un salón no puede reservarse dos veces en el mismo bloque.
+- El profesor debe estar disponible.
+- La capacidad del salón debe cubrir el grupo.
+- Un laboratorio debe asignarse a un salón compatible.
+- Debe cumplirse la carga semanal de la asignación.
+
+## Soft constraints
+
+- Preferencia de horario del profesor.
+- Reducir huecos.
+- Evitar primera/última hora.
+- Distribuir sesiones en distintos días.
+- Evitar demasiadas clases consecutivas.
+- Compactar el horario del grupo.
+
+## Estados de horario
+
+```text
+DRAFT → GENERATED → REVIEWED → PUBLISHED → ARCHIVED
 ```
 
-## Navegación
+## Definición de terminado
 
-- [Documentación](./README.md)
-- [Instalación](./01_INSTALACION_Y_EJECUCION.md)
-- [Sesión 01](./SESION_01_FOUNDATION_MONOREPO.md)
+- Sin conflictos duros.
+- Score calculado.
+- Versión almacenada.
+- API protegida.
+- Tests críticos en verde.
+- Deploy disponible desde una sola URL Netlify.
