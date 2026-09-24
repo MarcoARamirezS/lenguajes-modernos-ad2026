@@ -1,3 +1,5 @@
+[Repositorio](../../README.md) · [Proyecto](../README.md) · [Índice](./README.md) · [← SESION_03_AUTH_USERS_JWT.md](./SESION_03_AUTH_USERS_JWT.md) · [SESION_05_CATEGORIES_CATALOGO.md →](./SESION_05_CATEGORIES_CATALOGO.md)
+
 # Sesión 04 — RBAC y rutas privadas
 
 > Archivo restaurado para mantener íntegra la navegación del repositorio guía.
@@ -37,3 +39,7 @@ controller
 - [ ] Las pruebas se ejecutan en verde.
 
 [Volver a documentación del Proyecto 01](./README.md)
+
+---
+
+[Repositorio](../../README.md) · [Proyecto](../README.md) · [Índice](./README.md) · [← SESION_03_AUTH_USERS_JWT.md](./SESION_03_AUTH_USERS_JWT.md) · [SESION_05_CATEGORIES_CATALOGO.md →](./SESION_05_CATEGORIES_CATALOGO.md)

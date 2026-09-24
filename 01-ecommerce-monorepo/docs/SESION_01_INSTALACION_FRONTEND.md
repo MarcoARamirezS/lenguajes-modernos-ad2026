@@ -1,3 +1,5 @@
+[Repositorio](../../README.md) · [Proyecto](../README.md) · [Índice](./README.md) · [← 02_FRONTEND_NUXT4_GUIA.md](./02_FRONTEND_NUXT4_GUIA.md) · [SESION_02_PRODUCTS_COMPLETO.md →](./SESION_02_PRODUCTS_COMPLETO.md)
+
 # Instalación del Frontend Nuxt 4 en el Monorepo
 
 Esta guía explica cómo agregar el frontend al monorepo actual del proyecto e-commerce.
@@ -400,3 +402,6 @@ git commit -m "feat(web): add Nuxt ecommerce frontend"
 - [ ] Órdenes se generan correctamente.
 - [ ] Admin puede crear productos y categorías.
 
+---
+
+[Repositorio](../../README.md) · [Proyecto](../README.md) · [Índice](./README.md) · [← 02_FRONTEND_NUXT4_GUIA.md](./02_FRONTEND_NUXT4_GUIA.md) · [SESION_02_PRODUCTS_COMPLETO.md →](./SESION_02_PRODUCTS_COMPLETO.md)

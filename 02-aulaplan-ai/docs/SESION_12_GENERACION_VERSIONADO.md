@@ -1,137 +1,80 @@
-# 12 — Generación, versiones y publicación
+[Repositorio](../../README.md) · [Proyecto](../README.md) · [Índice](./README.md) · [← Sesión 11](./SESION_11_GEMINI_PYTHON.md) · [Sesión 13 →](./SESION_13_TESTING_QA.md)
+
+# Sesión 12 — Generación y versionado
 
 **Duración:** 1 hora 30 minutos.
 
 ## Objetivo
 
-Convertir el solver en un flujo de negocio completo con versiones inmutables, revisión y publicación.
+Convertir el solver en un flujo de negocio auditable.
 
 ## Distribución de tiempo
 
-- **00–15 min** — Lifecycle
-- **15–35 min** — Persistencia
-- **35–55 min** — Versioning
-- **55–75 min** — Review/publish
-- **75–90 min** — Audit
-
-## Conceptos
-
-- immutable versions
-- status transitions
-- transactional thinking
-- auditability
-
-## Desarrollo
-
-### 1. Guardar versión
-
-Cada ejecución exitosa crea `scheduleVersions` y sus `scheduleEntries`. No sobrescribir una versión anterior.
-
-### 2. Estados
-
-Permitir transiciones válidas `GENERATED → REVIEWED → PUBLISHED → ARCHIVED`.
-
-### 3. Publicación única
-
-Cuando se publica una versión, definir claramente qué ocurre con la versión publicada anterior del mismo periodo.
-
-### 4. Auditoría
-
-Registrar actor, timestamp, versión, acción y metadatos relevantes sin almacenar tokens.
-
-### 5. Frontend
-
-Conectar comparación de versiones, score y botón de publicación al contrato real.
-
-## Endpoints al cierre
-
-- `GET /api/schedules`
-- `GET /api/schedules/:id`
-- `POST /api/schedules/:id/review`
-- `POST /api/schedules/:id/publish`
-- `POST /api/schedules/:id/archive`
-
-## Checklist de cierre
-
-- [ ] Versiones son inmutables
-- [ ] Transiciones inválidas regresan 409
-- [ ] Solo rol permitido publica
-- [ ] Auditoría creada
-- [ ] Frontend muestra versión publicada
-
-## Commit sugerido
-
-```bash
-git add .
-git commit -m "feat: implement schedule versioning and publication"
+```text
+00–15  workflow
+15–35  generate endpoint
+35–55  versions
+55–70  publish
+70–85  audit
+85–90  commit
 ```
 
-## Persistencia de versiones
 
-### Estado
+## Estados
 
-```ts
-export type ScheduleStatus =
-  | 'GENERATED'
-  | 'REVIEWED'
-  | 'PUBLISHED'
-  | 'ARCHIVED'
+```text
+DRAFT
+GENERATING
+GENERATED
+REVIEWED
+PUBLISHED
+ARCHIVED
 ```
 
-### Generación
+## Regla
 
-El service debe:
+Una versión publicada no se sobrescribe.
 
-1. cargar `ScheduleProblem` desde repositories;
-2. validar preflight;
-3. ejecutar solver con `MAX_SOLVER_MS` limitado;
-4. rechazar si no existe solución válida;
-5. crear un documento `scheduleVersions`;
-6. guardar `scheduleEntries` asociados;
-7. devolver métricas y versión.
+## Flujo
 
-Ejemplo de documento:
-
-```ts
-const version = {
-  academicPeriodId,
-  version: nextVersion,
-  status: 'GENERATED',
-  score: result.score,
-  hardViolations: 0,
-  softViolations: result.softViolations,
-  solver: {
-    nodes: result.nodes,
-    elapsedMs: result.elapsedMs,
-    timedOut: result.timedOut
-  },
-  createdBy: user.uid,
-  createdAt: new Date().toISOString()
-}
+```text
+POST /schedules/generate
+ ↓
+load data
+ ↓
+validate
+ ↓
+solve
+ ↓
+score
+ ↓
+save immutable version
+ ↓
+return result
 ```
-
-## Transiciones
-
-```ts
-const allowedTransitions = {
-  GENERATED: ['REVIEWED', 'ARCHIVED'],
-  REVIEWED: ['PUBLISHED', 'ARCHIVED'],
-  PUBLISHED: ['ARCHIVED'],
-  ARCHIVED: []
-} as const
-```
-
-Si una transición no está permitida, responder `409 INVALID_SCHEDULE_TRANSITION`.
 
 ## Publicación
 
-Usar una transacción Firestore para:
+```text
+POST /schedules/:id/publish
+```
 
-1. localizar la versión publicada actual del mismo periodo;
-2. archivarla si existe;
-3. marcar la nueva versión como `PUBLISHED`;
-4. registrar `publishedAt` y `publishedBy`.
+Debe registrar:
 
-De esta forma nunca existen dos versiones publicadas activas para el mismo periodo.
+- user_id;
+- timestamp;
+- version;
+- score;
+- cambios relevantes.
 
-[Volver al índice](./README.md)
+
+## Cierre verificable
+
+- [ ] generación persiste versión.
+- [ ] publicación protegida.
+- [ ] versión publicada inmutable.
+- [ ] auditoría mínima.
+
+---
+
+[Repositorio](../../README.md) · [Proyecto](../README.md) · [Índice](./README.md) · [← Sesión 11](./SESION_11_GEMINI_PYTHON.md) · [Sesión 13 →](./SESION_13_TESTING_QA.md)

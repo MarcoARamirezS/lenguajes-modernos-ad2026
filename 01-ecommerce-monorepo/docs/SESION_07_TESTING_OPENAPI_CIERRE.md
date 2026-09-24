@@ -1,3 +1,5 @@
+[Repositorio](../../README.md) · [Proyecto](../README.md) · [Índice](./README.md) · [← SESION_06_CART_ORDERS.md](./SESION_06_CART_ORDERS.md) · [HOTIFX_AJUSTES_MONOREPO.md →](./HOTIFX_AJUSTES_MONOREPO.md)
+
 # SESIÓN 7 — TESTING + OPENAPI + CIERRE
 
 ## Objetivo
@@ -645,3 +647,7 @@ npm run lint
 npm run test --workspace=@ecommerce/api
 npm run dev
 ```
+
+---
+
+[Repositorio](../../README.md) · [Proyecto](../README.md) · [Índice](./README.md) · [← SESION_06_CART_ORDERS.md](./SESION_06_CART_ORDERS.md) · [HOTIFX_AJUSTES_MONOREPO.md →](./HOTIFX_AJUSTES_MONOREPO.md)

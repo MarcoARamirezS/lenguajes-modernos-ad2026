@@ -1,3 +1,5 @@
+[Repositorio](../../README.md) · [Proyecto](../README.md) · [Índice](./README.md) · [← 01_INSTALACION_Y_EJECUCION.md](./01_INSTALACION_Y_EJECUCION.md) · [SESION_01_INSTALACION_FRONTEND.md →](./SESION_01_INSTALACION_FRONTEND.md)
+
 # Guía Frontend Nuxt 4
 
 Esta guía describe cómo debe quedar instalado y organizado el frontend dentro del monorepo.
@@ -234,3 +236,6 @@ npm run build:web
 - [Instalación y ejecución](./01_INSTALACION_Y_EJECUCION.md)
 - [README del proyecto](../README.md)
 
+---
+
+[Repositorio](../../README.md) · [Proyecto](../README.md) · [Índice](./README.md) · [← 01_INSTALACION_Y_EJECUCION.md](./01_INSTALACION_Y_EJECUCION.md) · [SESION_01_INSTALACION_FRONTEND.md →](./SESION_01_INSTALACION_FRONTEND.md)

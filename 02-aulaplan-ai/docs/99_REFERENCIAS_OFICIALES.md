@@ -1,33 +1,41 @@
+[Repositorio](../../README.md) · [Proyecto](../README.md) · [Índice](./README.md) · [← Sesión 14](./SESION_14_CICD_NETLIFY_FIREBASE_GITHUB.md) · [Proyecto →](../README.md)
+
 # 99 — Referencias oficiales
-
-Validado para la arquitectura del curso el **23 de septiembre de 2026**.
-
-## Netlify
-
-- Functions — Getting started: https://docs.netlify.com/build/functions/get-started/
-- Functions configuration/routing: https://docs.netlify.com/build/functions/configuration/
-- Functions API reference: https://docs.netlify.com/build/functions/api/
-- Lambda compatibility / Go deprecation: https://docs.netlify.com/build/functions/lambda-compatibility/?fn-language=go
-- Monorepos/build configuration: https://docs.netlify.com/build/configure-builds/monorepos/
 
 ## Nuxt
 
-- Nuxt 4 installation: https://nuxt.com/docs/4.x/getting-started/installation
-- Deployment: https://nuxt.com/docs/4.x/getting-started/deployment
-- Netlify: https://nuxt.com/deploy/netlify
+- https://nuxt.com/docs/4.x/getting-started/installation
+- https://nuxt.com/docs/4.x/getting-started/deployment
 
 ## Firebase
 
-- Admin SDK setup: https://firebase.google.com/docs/admin/setup
-- Authentication: https://firebase.google.com/docs/auth
-- Firestore: https://firebase.google.com/docs/firestore
-- Emulator Suite: https://firebase.google.com/docs/emulator-suite
+- https://firebase.google.com/docs/functions
+- https://firebase.google.com/docs/functions/get-started
+- https://firebase.google.com/docs/functions/http-events
+- https://firebase.google.com/docs/admin/setup
+- https://firebase.google.com/docs/firestore
+- https://firebase.google.com/docs/emulator-suite
+
+## Netlify
+
+- https://docs.netlify.com/build/functions/get-started/
+- https://docs.netlify.com/build/configure-builds/available-software-at-build-time/
+- https://docs.netlify.com/routing/redirects/rewrites-proxies/
 
 ## Gemini
 
-- Getting started: https://ai.google.dev/gemini-api/docs/get-started
-- Google GenAI SDK migration/current SDK: https://ai.google.dev/gemini-api/docs/migrate
+- https://ai.google.dev/gemini-api/docs
+- https://ai.google.dev/gemini-api/docs/quickstart
 
-## Nota de arquitectura
+## Python
 
-Aunque Netlify documenta Go Functions mediante compatibilidad AWS Lambda, ese modo está deprecated y Netlify indica que dejará de aceptar deploys en ese modo el **1 de julio de 2027**. Por eso AulaPlan AI usa Netlify Functions modernas en TypeScript.
+- https://docs.python.org/3/
+- https://docs.pydantic.dev/
+
+## Nota técnica
+
+La documentación de Netlify debe consultarse antes de cambiar el runtime del backend. Python disponible durante `build` no equivale a Python como runtime de Netlify Functions.
+
+---
+
+[Repositorio](../../README.md) · [Proyecto](../README.md) · [Índice](./README.md) · [← Sesión 14](./SESION_14_CICD_NETLIFY_FIREBASE_GITHUB.md) · [Proyecto →](../README.md)

@@ -1,3 +1,5 @@
+[Repositorio](../../README.md) · [Proyecto](../README.md) · [Índice](./README.md) · [← Proyecto](../README.md) · [01_INSTALACION_Y_EJECUCION.md →](./01_INSTALACION_Y_EJECUCION.md)
+
 # Mapa del Proyecto
 
 Este documento muestra cómo debe organizarse el proyecto `01-ecommerce-monorepo` dentro del repositorio general de la materia.
@@ -111,3 +113,6 @@ Mantener separados:
 
 Esto evita que el proyecto se vuelva difícil de navegar conforme crezca.
 
+---
+
+[Repositorio](../../README.md) · [Proyecto](../README.md) · [Índice](./README.md) · [← Proyecto](../README.md) · [01_INSTALACION_Y_EJECUCION.md →](./01_INSTALACION_Y_EJECUCION.md)

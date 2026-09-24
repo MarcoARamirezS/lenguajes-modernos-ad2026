@@ -1,69 +1,70 @@
 # Proyecto 02 — AulaPlan AI
 
-**AulaPlan AI** es un generador inteligente de horarios académicos diseñado como proyecto evolutivo para **Lenguajes Modernos AD2026**.
+[← Repositorio](../README.md) · [Guía general](../GUIA_DE_NAVEGACION.md) · [Índice de documentación](./docs/README.md)
 
-La prioridad del proyecto es backend, Firebase, arquitectura serverless, algoritmos de planificación e integración de IA. El frontend se entrega una sola vez y después permanece estable mientras las sesiones conectan funcionalidad real.
+**AulaPlan AI** es un generador inteligente de horarios académicos desarrollado como proyecto evolutivo.
 
-## Decisión de arquitectura
+## Objetivo académico
 
-Todo se despliega desde **un único monorepo** hacia **un único proyecto Netlify**:
+El frontend se entrega completo al inicio. Las sesiones se concentran en un backend **Python** y en la integración con Firebase.
+
+## Stack definitivo
+
+| Capa | Tecnología |
+| --- | --- |
+| Frontend | Nuxt 4 + Vue 3 + TypeScript |
+| Estado | Pinia |
+| UI | Tailwind CSS 4 + daisyUI |
+| Backend | **Python 3.11** |
+| Runtime backend | **Cloud Functions for Firebase (Python)** |
+| Router HTTP | Flask app expuesta por una HTTP Function |
+| Validación | Pydantic |
+| Auth | Firebase Authentication |
+| DB | Cloud Firestore |
+| Admin | Firebase Admin SDK para Python |
+| IA | Gemini API con `google-genai` |
+| Scheduler | Python: backtracking + heurísticas + scoring |
+| Tests backend | pytest |
+| E2E | Playwright |
+| Front deploy | Netlify |
+| Backend deploy | Firebase Functions |
+| Repositorio | GitHub monorepo |
+
+## Arquitectura
 
 ```text
 GitHub monorepo
        │
-       ▼
-    Netlify
-       │
-       ├── Nuxt 4 estático
-       │      └── /
-       │
-       └── Netlify Functions TypeScript
-              └── /api/*
-                      │
-                      ├── Firebase Auth
-                      ├── Firestore
-                      ├── Scheduler propio
-                      └── Gemini API
+       ├──────────────────────────────┐
+       │                              │
+       ▼                              ▼
+    Netlify                    Firebase Functions
+  Nuxt 4 SPA                     Python 3.11
+       │                              │
+       │ /api/*                       │
+       └──────── Netlify proxy ───────┤
+                                      │
+                       ┌──────────────┼──────────────┐
+                       ▼              ▼              ▼
+                   Firestore         Auth          Gemini
+
+                                      ▼
+                               Scheduler Python
 ```
 
-No se utiliza Render, Railway, Vercel ni otro hosting para el backend.
+## Por qué no se ejecuta Python dentro de Netlify
 
-## Stack
+Netlify dispone de Python en su entorno de **build**, pero sus Functions modernas no tienen runtime Python. Por ello, una guía que afirmara que FastAPI o un backend Python corre como Netlify Function sería incorrecta.
 
-| Capa | Tecnología |
-| --- | --- |
-| Monorepo | npm Workspaces |
-| Frontend | Nuxt 4 + Vue 3 + TypeScript |
-| State | Pinia |
-| UI | Tailwind CSS 4 + daisyUI |
-| Backend | Netlify Functions modernas `.mts` |
-| Contratos | TypeScript + Zod |
-| Auth | Firebase Authentication |
-| DB | Cloud Firestore |
-| Backend Firebase | Firebase Admin SDK |
-| Scheduling | Backtracking + heurísticas + scoring |
-| IA | Gemini API con `@google/genai` |
-| Unit/API tests | Vitest |
-| E2E | Playwright |
-| Deploy | Netlify |
-| CI | GitHub Actions + Netlify Continuous Deployment |
+Para mantener el objetivo pedagógico de Python:
 
-## Por qué no se usa Go en esta versión
+- el frontend se despliega en Netlify;
+- el backend Python se despliega en Cloud Functions for Firebase;
+- Netlify proxifica `/api/*`;
+- el frontend usa una única ruta `/api`;
+- todo el código vive en el mismo monorepo.
 
-Netlify aún permite Go mediante su API compatible con AWS Lambda, pero ese modo fue marcado como **deprecated** y Netlify indica que dejará de aceptar despliegues en ese modo a partir del **1 de julio de 2027**. Para una guía nueva se utiliza la API moderna de Netlify Functions con TypeScript.
-
-Esto evita enseñar una arquitectura con fecha de retiro próxima y permite centrar la novedad de la materia en:
-
-- serverless moderno;
-- Web `Request` / `Response`;
-- arquitectura sin Express;
-- Firebase Admin;
-- diseño de un motor de horarios;
-- backtracking y heurísticas;
-- IA estructurada;
-- CI/CD en un único proveedor.
-
-## Estructura técnica objetivo
+## Estructura objetivo
 
 ```text
 aulaplan-ai/
@@ -74,71 +75,57 @@ aulaplan-ai/
 │   │   ├── nuxt.config.ts
 │   │   └── package.json
 │   └── api/
-│       ├── netlify/
-│       │   └── functions/
-│       │       └── api.mts
+│       ├── main.py
+│       ├── requirements.txt
+│       ├── .python-version
 │       ├── src/
 │       │   ├── ai/
 │       │   ├── auth/
 │       │   ├── core/
 │       │   ├── firebase/
+│       │   ├── http/
 │       │   ├── repositories/
-│       │   ├── router/
 │       │   ├── scheduler/
+│       │   ├── schemas/
 │       │   └── services/
-│       ├── tests/
-│       └── package.json
-├── packages/
-│   └── contracts/
+│       └── tests/
 ├── firebase/
-│   ├── firebase.json
-│   ├── firestore.indexes.json
-│   └── firestore.rules
+│   ├── firestore.rules
+│   └── firestore.indexes.json
 ├── docs/
 ├── .github/workflows/
-├── .nvmrc
-├── .gitignore
+├── firebase.json
 ├── netlify.toml
 ├── package.json
 └── README.md
 ```
 
+## Ruta recomendada
+
+1. [Inicio rápido](./docs/00_INICIO_RAPIDO.md)
+2. [Mapa del proyecto](./docs/01_MAPA_DEL_PROYECTO.md)
+3. [Instalación](./docs/02_INSTALACION_MAC_LINUX_WINDOWS.md)
+4. [Frontend único](./docs/03_FRONTEND_NUXT4_ENTREGA_UNICA.md)
+5. [Arquitectura Python/Firebase/Netlify](./docs/07_ARQUITECTURA_PYTHON_FIREBASE_NETLIFY.md)
+6. [Sesión 01](./docs/SESION_01_FOUNDATION_MONOREPO_PYTHON.md)
+
 ## Sesiones
 
-| # | Tema | Resultado |
-| ---: | --- | --- |
-| 01 | Foundation monorepo + Netlify | Proyecto ejecutándose desde cero |
-| 02 | Functions modernas y arquitectura | `/api/health` + router modular |
-| 03 | Firebase | Auth/Firestore/Emulators conectados |
-| 04 | Academic Core | Periodos, profesores, materias |
-| 05 | Recursos | Grupos, salones, bloques |
-| 06 | Disponibilidad | Disponibilidad y restricciones |
-| 07 | Seguridad | Firebase Auth + RBAC |
-| 08 | Scheduling Domain | Problema de horarios modelado |
-| 09 | Scheduler I | Backtracking funcional |
-| 10 | Scheduler II | Heurísticas y scoring |
-| 11 | IA | Gemini interpreta restricciones |
-| 12 | Generación | Versionado y publicación |
-| 13 | QA | Unit, API, Emulator y E2E |
-| 14 | CI/CD | GitHub + Netlify producción |
+| Sesión | Tema |
+| ---: | --- |
+| 01 | Monorepo + Python + Nuxt + Firebase CLI |
+| 02 | Arquitectura backend Python |
+| 03 | Firebase Functions + Firestore + Emulators |
+| 04 | Academic Core |
+| 05 | Groups, Rooms & Time Blocks |
+| 06 | Availability & Constraints |
+| 07 | Firebase Auth + RBAC |
+| 08 | Scheduling Domain |
+| 09 | Backtracking |
+| 10 | Heurísticas + scoring |
+| 11 | Gemini con Python |
+| 12 | Generación + versionado |
+| 13 | Testing + QA |
+| 14 | GitHub + Netlify + Firebase deployment |
 
-## Documentación
-
-[Ir al índice de documentación](./docs/README.md)
-
-## Criterio de cierre
-
-El proyecto termina cuando un coordinador puede:
-
-1. autenticarse;
-2. administrar catálogos académicos;
-3. capturar disponibilidades y restricciones;
-4. solicitar la generación de un horario;
-5. recibir una solución sin conflictos duros;
-6. comparar calidad mediante scoring;
-7. interpretar restricciones escritas en lenguaje natural mediante IA;
-8. guardar versiones;
-9. publicar un horario;
-10. usar la aplicación completa desde una sola URL de Netlify.
-
-[Volver al índice general](../README.md)
+[Continuar → Índice de documentación](./docs/README.md)

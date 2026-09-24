@@ -1,3 +1,5 @@
+[← Repositorio](../README.md) · [Guía general](../GUIA_DE_NAVEGACION.md) · [Documentación](./docs/README.md)
+
 # Proyecto 01 - E-Commerce Monorepo
 
 Primer proyecto de la materia **Lenguajes Modernos AD2026**.
@@ -148,3 +150,6 @@ flowchart TD
 
 [Volver a Lenguajes Modernos AD2026](../README.md)
 
+---
+
+[← Repositorio](../README.md) · [Documentación →](./docs/README.md)

@@ -1,39 +1,45 @@
-# Documentación — AulaPlan AI
+# Índice de documentación — AulaPlan AI
 
-## Orden recomendado
+[← Proyecto](../README.md) · [Repositorio](../../README.md)
 
-| Orden | Archivo | Propósito |
+## Empieza aquí
+
+| Paso | Documento | Resultado |
 | ---: | --- | --- |
-| 1 | [00_MAPA_DEL_PROYECTO.md](./00_MAPA_DEL_PROYECTO.md) | Visión general |
-| 2 | [01_INSTALACION_Y_EJECUCION.md](./01_INSTALACION_Y_EJECUCION.md) | Requisitos y comandos |
-| 3 | [02_FRONTEND_NUXT4_ENTREGA_UNICA.md](./02_FRONTEND_NUXT4_ENTREGA_UNICA.md) | Contrato del frontend congelado |
-| 4 | [03_GIT_GITHUB_WORKFLOW.md](./03_GIT_GITHUB_WORKFLOW.md) | Flujo de ramas y commits |
-| 5 | [04_MODELO_FIRESTORE.md](./04_MODELO_FIRESTORE.md) | Modelo de datos |
-| 6 | [05_CONTRATO_API.md](./05_CONTRATO_API.md) | Rutas REST |
-| 7 | [06_DECISION_ARQUITECTURA_NETLIFY.md](./06_DECISION_ARQUITECTURA_NETLIFY.md) | Razones técnicas |
-| 8 | [07_VARIABLES_ENTORNO_Y_SEGURIDAD.md](./07_VARIABLES_ENTORNO_Y_SEGURIDAD.md) | Secrets y ambientes |
-| 9 | SESION_01 ... SESION_14 | Desarrollo evolutivo |
-| 10 | [99_REFERENCIAS_OFICIALES.md](./99_REFERENCIAS_OFICIALES.md) | Documentación oficial |
+| 1 | [Inicio rápido](./00_INICIO_RAPIDO.md) | Entender qué se construye |
+| 2 | [Mapa del proyecto](./01_MAPA_DEL_PROYECTO.md) | Comprender arquitectura y flujo |
+| 3 | [Instalación](./02_INSTALACION_MAC_LINUX_WINDOWS.md) | Preparar macOS/Linux/Windows |
+| 4 | [Frontend único](./03_FRONTEND_NUXT4_ENTREGA_UNICA.md) | Tener la interfaz completa |
+| 5 | [Git/GitHub](./04_GIT_GITHUB_WORKFLOW.md) | Preparar flujo de trabajo |
+| 6 | [Modelo Firestore](./05_MODELO_FIRESTORE.md) | Definir persistencia |
+| 7 | [Contrato API](./06_CONTRATO_API.md) | Definir endpoints |
+| 8 | [Arquitectura Python/Firebase/Netlify](./07_ARQUITECTURA_PYTHON_FIREBASE_NETLIFY.md) | Entender deployment real |
+| 9 | [Variables y seguridad](./08_VARIABLES_ENTORNO_Y_SEGURIDAD.md) | Configurar secretos |
+| 10 | [Checklist global](./09_CHECKLIST_GLOBAL.md) | Validar preparación |
 
-## Regla del proyecto
+## Desarrollo por sesiones
 
-A partir de la entrega inicial del frontend, el esfuerzo de clase se concentra en backend y Firebase. Las pantallas solo se modifican cuando el contrato API lo exige.
+| # | Documento | Resultado verificable |
+| ---: | --- | --- |
+| 01 | [Foundation](./SESION_01_FOUNDATION_MONOREPO_PYTHON.md) | Monorepo + Nuxt + entorno Python |
+| 02 | [Backend Python](./SESION_02_BACKEND_PYTHON_ARQUITECTURA.md) | API modular + health |
+| 03 | [Firebase Functions](./SESION_03_FIREBASE_FUNCTIONS_FIRESTORE.md) | Function Python + Firestore |
+| 04 | [Academic Core](./SESION_04_ACADEMIC_CORE.md) | Periodos, profesores, materias |
+| 05 | [Resources](./SESION_05_GROUPS_ROOMS_BLOCKS.md) | Grupos, salones, bloques |
+| 06 | [Availability](./SESION_06_AVAILABILITY_CONSTRAINTS.md) | Disponibilidad y restricciones |
+| 07 | [Auth & RBAC](./SESION_07_FIREBASE_AUTH_RBAC.md) | Token Firebase + roles |
+| 08 | [Scheduling Domain](./SESION_08_SCHEDULING_DOMAIN.md) | Modelo del problema |
+| 09 | [Backtracking](./SESION_09_SCHEDULER_BACKTRACKING.md) | Generador válido |
+| 10 | [Heurísticas](./SESION_10_SCHEDULER_HEURISTICS_SCORING.md) | Mejor solución por scoring |
+| 11 | [Gemini Python](./SESION_11_GEMINI_PYTHON.md) | Restricciones desde lenguaje natural |
+| 12 | [Versionado](./SESION_12_GENERACION_VERSIONADO.md) | DRAFT/GENERATED/PUBLISHED |
+| 13 | [Testing](./SESION_13_TESTING_QA.md) | pytest + emuladores + E2E |
+| 14 | [CI/CD](./SESION_14_CICD_NETLIFY_FIREBASE_GITHUB.md) | Front Netlify + backend Firebase |
 
-## Sesiones
+## Referencias
 
-- [Sesión 01 — Foundation](./SESION_01_FOUNDATION_MONOREPO_NETLIFY.md)
-- [Sesión 02 — Netlify Functions](./SESION_02_NETLIFY_FUNCTIONS_ARQUITECTURA.md)
-- [Sesión 03 — Firebase](./SESION_03_FIREBASE_FIRESTORE.md)
-- [Sesión 04 — Academic Core](./SESION_04_ACADEMIC_CORE.md)
-- [Sesión 05 — Groups, Rooms, Blocks](./SESION_05_GROUPS_ROOMS_BLOCKS.md)
-- [Sesión 06 — Availability & Constraints](./SESION_06_AVAILABILITY_CONSTRAINTS.md)
-- [Sesión 07 — Auth & RBAC](./SESION_07_FIREBASE_AUTH_RBAC.md)
-- [Sesión 08 — Scheduling Domain](./SESION_08_SCHEDULING_DOMAIN.md)
-- [Sesión 09 — Backtracking](./SESION_09_SCHEDULER_BACKTRACKING.md)
-- [Sesión 10 — Heuristics & Scoring](./SESION_10_SCHEDULER_HEURISTICS_SCORING.md)
-- [Sesión 11 — Gemini](./SESION_11_GEMINI_RESTRICCIONES.md)
-- [Sesión 12 — Generation & Versioning](./SESION_12_GENERACION_VERSIONADO.md)
-- [Sesión 13 — Testing](./SESION_13_TESTING_QA.md)
-- [Sesión 14 — CI/CD](./SESION_14_CICD_NETLIFY_GITHUB.md)
+- [Referencias oficiales](./99_REFERENCIAS_OFICIALES.md)
 
-[Volver al README del proyecto](../README.md)
+## Regla de navegación
+
+Cada documento incluye **Anterior** y **Siguiente** tanto arriba como abajo.

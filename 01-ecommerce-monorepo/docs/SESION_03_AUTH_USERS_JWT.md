@@ -1,3 +1,5 @@
+[Repositorio](../../README.md) · [Proyecto](../README.md) · [Índice](./README.md) · [← SESION_02_PRODUCTS_COMPLETO.md](./SESION_02_PRODUCTS_COMPLETO.md) · [SESION_04_RBAC_RUTAS_PRIVADAS.md →](./SESION_04_RBAC_RUTAS_PRIVADAS.md)
+
 # SESIÓN 3 — AUTH + USERS + JWT
 
 ## Objetivo
@@ -1273,3 +1275,7 @@ git switch -c feature/auth-users
 git add .
 git commit -m "feat(auth): add users and JWT authentication"
 ```
+
+---
+
+[Repositorio](../../README.md) · [Proyecto](../README.md) · [Índice](./README.md) · [← SESION_02_PRODUCTS_COMPLETO.md](./SESION_02_PRODUCTS_COMPLETO.md) · [SESION_04_RBAC_RUTAS_PRIVADAS.md →](./SESION_04_RBAC_RUTAS_PRIVADAS.md)

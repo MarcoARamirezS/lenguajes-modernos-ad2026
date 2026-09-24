@@ -1,3 +1,5 @@
+[Repositorio](../../README.md) · [Proyecto](../README.md) · [Índice](./README.md) · [← SESION_05_CATEGORIES_CATALOGO.md](./SESION_05_CATEGORIES_CATALOGO.md) · [SESION_07_TESTING_OPENAPI_CIERRE.md →](./SESION_07_TESTING_OPENAPI_CIERRE.md)
+
 # SESIÓN 6 — CART + ORDERS
 
 ## Objetivo
@@ -1173,3 +1175,7 @@ git switch -c feature/cart-orders
 git add .
 git commit -m "feat(orders): add cart and order flow"
 ```
+
+---
+
+[Repositorio](../../README.md) · [Proyecto](../README.md) · [Índice](./README.md) · [← SESION_05_CATEGORIES_CATALOGO.md](./SESION_05_CATEGORIES_CATALOGO.md) · [SESION_07_TESTING_OPENAPI_CIERRE.md →](./SESION_07_TESTING_OPENAPI_CIERRE.md)

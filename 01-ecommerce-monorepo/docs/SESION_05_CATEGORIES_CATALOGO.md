@@ -1,3 +1,5 @@
+[Repositorio](../../README.md) · [Proyecto](../README.md) · [Índice](./README.md) · [← SESION_04_RBAC_RUTAS_PRIVADAS.md](./SESION_04_RBAC_RUTAS_PRIVADAS.md) · [SESION_06_CART_ORDERS.md →](./SESION_06_CART_ORDERS.md)
+
 # SESIÓN 5 — CATEGORIES + CATÁLOGO
 
 ## Objetivo
@@ -764,3 +766,7 @@ git switch -c feature/categories
 git add .
 git commit -m "feat(catalog): add categories module"
 ```
+
+---
+
+[Repositorio](../../README.md) · [Proyecto](../README.md) · [Índice](./README.md) · [← SESION_04_RBAC_RUTAS_PRIVADAS.md](./SESION_04_RBAC_RUTAS_PRIVADAS.md) · [SESION_06_CART_ORDERS.md →](./SESION_06_CART_ORDERS.md)

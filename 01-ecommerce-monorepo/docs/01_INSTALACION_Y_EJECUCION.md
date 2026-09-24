@@ -1,3 +1,5 @@
+[Repositorio](../../README.md) · [Proyecto](../README.md) · [Índice](./README.md) · [← 00_MAPA_DEL_PROYECTO.md](./00_MAPA_DEL_PROYECTO.md) · [02_FRONTEND_NUXT4_GUIA.md →](./02_FRONTEND_NUXT4_GUIA.md)
+
 # Instalación y Ejecución del Monorepo
 
 Esta guía explica cómo instalar y ejecutar el proyecto completo.
@@ -209,3 +211,6 @@ git commit -m "chore: setup ecommerce monorepo"
 - [Mapa del proyecto](./00_MAPA_DEL_PROYECTO.md)
 - [Guía Frontend Nuxt 4](./02_FRONTEND_NUXT4_GUIA.md)
 
+---
+
+[Repositorio](../../README.md) · [Proyecto](../README.md) · [Índice](./README.md) · [← 00_MAPA_DEL_PROYECTO.md](./00_MAPA_DEL_PROYECTO.md) · [02_FRONTEND_NUXT4_GUIA.md →](./02_FRONTEND_NUXT4_GUIA.md)
