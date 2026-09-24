@@ -1,5 +1,3 @@
-[Repositorio](../../README.md) · [Proyecto](../README.md) · [Índice](./README.md) · [← SESION_01_INSTALACION_FRONTEND.md](./SESION_01_INSTALACION_FRONTEND.md) · [SESION_03_AUTH_USERS_JWT.md →](./SESION_03_AUTH_USERS_JWT.md)
-
 # Módulo Products — Backend E-Commerce con Node.js
 
 ## Objetivo
@@ -1113,7 +1111,3 @@ Express
 ```
 
 El módulo `Products` queda preparado para agregar posteriormente autenticación, roles y permisos sin modificar su arquitectura interna.
-
----
-
-[Repositorio](../../README.md) · [Proyecto](../README.md) · [Índice](./README.md) · [← SESION_01_INSTALACION_FRONTEND.md](./SESION_01_INSTALACION_FRONTEND.md) · [SESION_03_AUTH_USERS_JWT.md →](./SESION_03_AUTH_USERS_JWT.md)

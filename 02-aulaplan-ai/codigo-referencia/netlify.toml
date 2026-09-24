@@ -1,0 +1,14 @@
+[build]
+  command = "npm run generate:web"
+  publish = "apps/web/.output/public"
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://us-central1-YOUR_FIREBASE_PROJECT_ID.cloudfunctions.net/api/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

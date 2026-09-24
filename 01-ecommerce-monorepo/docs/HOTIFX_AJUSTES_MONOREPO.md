@@ -1,5 +1,3 @@
-[Repositorio](../../README.md) · [Proyecto](../README.md) · [Índice](./README.md) · [← SESION_07_TESTING_OPENAPI_CIERRE.md](./SESION_07_TESTING_OPENAPI_CIERRE.md) · [Proyecto →](../README.md)
-
 # Ajustes Mono - Repo
 
 Para poder trabajar todo como un monorepo debes de realizar los siguientes ajuste, primero borrar todas las carpetas 'node_modules' y archivos package-lock.json de tu proyecto
@@ -137,7 +135,3 @@ En raíz debes de sustituir el package.json con el siguiente codigo
 }
 
 ```
-
----
-
-[Repositorio](../../README.md) · [Proyecto](../README.md) · [Índice](./README.md) · [← SESION_07_TESTING_OPENAPI_CIERRE.md](./SESION_07_TESTING_OPENAPI_CIERRE.md) · [Proyecto →](../README.md)

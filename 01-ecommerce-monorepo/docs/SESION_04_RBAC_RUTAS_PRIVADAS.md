@@ -1,45 +1,83 @@
-[Repositorio](../../README.md) · [Proyecto](../README.md) · [Índice](./README.md) · [← SESION_03_AUTH_USERS_JWT.md](./SESION_03_AUTH_USERS_JWT.md) · [SESION_05_CATEGORIES_CATALOGO.md →](./SESION_05_CATEGORIES_CATALOGO.md)
-
 # Sesión 04 — RBAC y rutas privadas
 
-> Archivo restaurado para mantener íntegra la navegación del repositorio guía.
+[← Proyecto](../README.md) · [Índice](./README.md)
+
+> Este documento fue restaurado porque el README del repositorio original hacía referencia a la Sesión 04, pero el archivo no estaba incluido en el ZIP recibido.
 
 ## Objetivo
 
-Integrar autorización basada en roles sobre la autenticación desarrollada en la sesión anterior.
+Extender la autenticación JWT de la Sesión 03 para diferenciar permisos por rol y proteger operaciones sensibles.
 
-## Resultado esperado
+## Roles sugeridos
 
-- Middleware de autenticación reutilizable.
-- Middleware de autorización por roles.
-- Rutas administrativas protegidas.
-- Respuestas `401` para sesiones inválidas y `403` para permisos insuficientes.
-- Pruebas de los casos permitidos y rechazados.
+```text
+admin
+customer
+```
 
 ## Flujo
 
 ```text
-Request
+Login
   ↓
-Access token
+JWT
   ↓
-authenticate
+auth middleware
   ↓
-requireRole(...roles)
+req.user
+  ↓
+requireRole(...)
   ↓
 controller
 ```
 
-## Checklist
+## Ejemplo conceptual de middleware
 
-- [ ] El usuario no autenticado recibe `401`.
-- [ ] El usuario autenticado sin rol recibe `403`.
-- [ ] El rol autorizado accede al recurso.
-- [ ] Los permisos se validan en backend y no únicamente en frontend.
-- [ ] Las pruebas se ejecutan en verde.
+```js
+export function requireRole(...roles) {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({
+        error: 'Authentication required',
+      })
+    }
 
-[Volver a documentación del Proyecto 01](./README.md)
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({
+        error: 'Insufficient permissions',
+      })
+    }
 
----
+    next()
+  }
+}
+```
 
-[Repositorio](../../README.md) · [Proyecto](../README.md) · [Índice](./README.md) · [← SESION_03_AUTH_USERS_JWT.md](./SESION_03_AUTH_USERS_JWT.md) · [SESION_05_CATEGORIES_CATALOGO.md →](./SESION_05_CATEGORIES_CATALOGO.md)
+## Aplicación
+
+```js
+router.post(
+  '/products',
+  authenticate,
+  requireRole('admin'),
+  createProduct,
+)
+```
+
+## Validaciones
+
+- Sin JWT → `401`.
+- JWT válido sin permiso → `403`.
+- Admin → acceso a operación protegida.
+- El rol se obtiene del usuario autenticado; no debe confiarse en un rol enviado por el cliente.
+
+## Commit sugerido
+
+```bash
+git add .
+git commit -m "feat: add RBAC and private routes"
+```
+
+## Continuar
+
+[Sesión 05 — Categories](./SESION_05_CATEGORIES_CATALOGO.md)

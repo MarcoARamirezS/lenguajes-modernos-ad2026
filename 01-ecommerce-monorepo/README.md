@@ -149,7 +149,3 @@ flowchart TD
 ## Regresar al índice general
 
 [Volver a Lenguajes Modernos AD2026](../README.md)
-
----
-
-[← Repositorio](../README.md) · [Documentación →](./docs/README.md)

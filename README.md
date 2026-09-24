@@ -1,82 +1,130 @@
 # Lenguajes Modernos AD2026
 
-Repositorio guía de la materia **Lenguajes Modernos**.
+Repositorio general de la materia **Lenguajes Modernos**.
 
-> **Empieza aquí:** [Guía de navegación del repositorio](./GUIA_DE_NAVEGACION.md)
+Aquí se concentran los proyectos, prácticas, guías de instalación, evidencias y documentación técnica que se desarrollarán durante el curso.
 
-## Proyectos
+## Propósito del repositorio
 
-| Proyecto | Backend | Frontend | Datos / servicios | Guía |
-| --- | --- | --- | --- | --- |
-| 01 — E-Commerce Monorepo | Node.js + Express | Nuxt 4 | Firebase | [Abrir proyecto](./01-ecommerce-monorepo/README.md) |
-| 02 — AulaPlan AI | **Python + Cloud Functions for Firebase** | Nuxt 4 | Firestore, Auth, Gemini | [Abrir proyecto](./02-aulaplan-ai/README.md) |
+Este repositorio funciona como punto de entrada para todos los proyectos de la materia. Cada proyecto tendrá su propia carpeta, su propio `README.md` y una carpeta `docs` con las sesiones, guías técnicas y material de apoyo.
 
-## Proyecto 02 — AulaPlan AI
+## Objetivo de la materia
 
-AulaPlan AI es el proyecto evolutivo orientado a backend Python. El frontend se entrega una sola vez y el trabajo posterior se concentra en:
+Desarrollar aplicaciones modernas aplicando lenguajes, frameworks, herramientas y flujos de trabajo usados actualmente en proyectos profesionales.
 
-- Python;
-- funciones HTTP serverless;
-- Firebase Admin;
-- Firestore;
-- Firebase Authentication;
-- Pydantic;
-- arquitectura por capas;
-- generación de horarios mediante backtracking;
-- heurísticas y scoring;
-- Gemini API;
-- testing;
-- GitHub;
-- Netlify para el frontend;
-- Cloud Functions for Firebase para el runtime Python.
+Durante el curso se trabajará con:
 
-### Aclaración de despliegue
+- Control de versiones con Git y GitHub.
+- Desarrollo frontend moderno.
+- Desarrollo backend con APIs REST.
+- Arquitectura modular.
+- Monorepos con npm Workspaces.
+- Autenticación y autorización.
+- Persistencia de datos.
+- Consumo de APIs desde frontend.
+- Pruebas básicas.
+- Documentación técnica.
+- Preparación para despliegue.
 
-Netlify se mantiene como hosting del frontend y como URL pública principal, pero **Netlify Functions no ofrece runtime Python**. Para conservar un backend Python real, la API se ejecuta como **Cloud Functions for Firebase en Python** y Netlify proxifica `/api/*` hacia esa función.
+## Stack general del curso
 
-Esto permite que el frontend consuma:
+| Área | Herramientas |
+| --- | --- |
+| Control de versiones | Git, GitHub |
+| Runtime | Node.js LTS |
+| Monorepo | npm Workspaces |
+| Backend | Express, Zod, JWT, Firebase Admin SDK |
+| Base de datos | Firestore |
+| Frontend | Nuxt 4, Vue 3, TypeScript |
+| Estado frontend | Pinia |
+| Estilos | Tailwind CSS |
+| Pruebas | Vitest, Supertest, Playwright |
+| Documentación | Markdown, OpenAPI |
 
-```text
-https://TU-SITIO.netlify.app/api/*
-```
-
-aunque el runtime Python sea administrado por Firebase.
-
-## Estructura
+## Estructura del repositorio
 
 ```text
 lenguajes-modernos-ad2026/
 ├── README.md
-├── GUIA_DE_NAVEGACION.md
-├── 01-ecommerce-monorepo/
-│   ├── README.md
-│   └── docs/
-└── 02-aulaplan-ai/
+└── 01-ecommerce-monorepo/
     ├── README.md
     └── docs/
+        ├── README.md
+        ├── 00_MAPA_DEL_PROYECTO.md
+        ├── 01_INSTALACION_Y_EJECUCION.md
+        ├── 02_FRONTEND_NUXT4_GUIA.md
+        ├── SESION_01_INSTALACION_FRONTEND.md
+        ├── SESION_02_PRODUCTS_COMPLETO.md
+        ├── SESION_03_AUTH_USERS_JWT.md
+        ├── SESION_04_RBAC_RUTAS_PRIVADAS.md
+        ├── SESION_05_CATEGORIES_CATALOGO.md
+        ├── SESION_06_CART_ORDERS.md
+        └── SESION_07_TESTING_OPENAPI_CIERRE.md
 ```
+
+## Proyectos
+
+| Proyecto | Descripción | Carpeta |
+| --- | --- | --- |
+| Proyecto 01 | E-commerce con backend, frontend y monorepo | [`01-ecommerce-monorepo`](./01-ecommerce-monorepo/README.md) |
+
+## Convención de trabajo
+
+Cada proyecto debe incluir:
+
+- `README.md` del proyecto.
+- Carpeta `docs`.
+- Guías por sesión.
+- Instrucciones de instalación.
+- Checklist de entrega.
+- Commits por avance.
+
+## Flujo Git sugerido
+
+Crear una rama por sesión o bloque funcional:
+
+```bash
+git switch -c feature/sesion-01-instalacion
+```
+
+Guardar cambios:
+
+```bash
+git status
+git add .
+git commit -m "docs: add session 01 installation guide"
+```
+
+Subir cambios:
+
+```bash
+git push origin feature/sesion-01-instalacion
+```
+
+## Criterios generales de entrega
+
+Cada entrega debe incluir:
+
+- Código fuente actualizado.
+- Documentación correspondiente.
+- Evidencia de ejecución.
+- Commits claros.
+- Capturas cuando se soliciten.
+- Descripción breve de problemas encontrados y solución aplicada.
+
+## Reglas importantes
+
+- No subir `node_modules`.
+- No subir archivos `.env`.
+- Mantener actualizados los README.
+- Usar nombres claros para carpetas, ramas y commits.
+- Probar el proyecto antes de entregar.
 
 ## Navegación rápida
 
-### General
+- [Proyecto 01 - E-Commerce Monorepo](./01-ecommerce-monorepo/README.md)
+- [Documentación del Proyecto 01](./01-ecommerce-monorepo/docs/README.md)
+- [Mapa del Proyecto 01](./01-ecommerce-monorepo/docs/00_MAPA_DEL_PROYECTO.md)
+- [Instalación y ejecución](./01-ecommerce-monorepo/docs/01_INSTALACION_Y_EJECUCION.md)
+- [Guía Frontend Nuxt 4](./01-ecommerce-monorepo/docs/02_FRONTEND_NUXT4_GUIA.md)
 
-- [Guía de navegación](./GUIA_DE_NAVEGACION.md)
-- [Proyecto 01](./01-ecommerce-monorepo/README.md)
-- [Proyecto 02 — AulaPlan AI](./02-aulaplan-ai/README.md)
-
-### AulaPlan AI
-
-- [Índice de documentación](./02-aulaplan-ai/docs/README.md)
-- [Inicio rápido](./02-aulaplan-ai/docs/00_INICIO_RAPIDO.md)
-- [Instalación](./02-aulaplan-ai/docs/02_INSTALACION_MAC_LINUX_WINDOWS.md)
-- [Frontend único](./02-aulaplan-ai/docs/03_FRONTEND_NUXT4_ENTREGA_UNICA.md)
-- [Arquitectura Python/Firebase/Netlify](./02-aulaplan-ai/docs/07_ARQUITECTURA_PYTHON_FIREBASE_NETLIFY.md)
-- [Sesión 01](./02-aulaplan-ai/docs/SESION_01_FOUNDATION_MONOREPO_PYTHON.md)
-
-## Reglas del repositorio
-
-- No subir `.env`.
-- No subir credenciales de cuentas de servicio.
-- No subir `node_modules`, `.venv`, `__pycache__` ni artefactos locales.
-- Cada sesión debe cerrar con una validación funcional y un commit.
-- La documentación debe indicar siempre el documento anterior y siguiente.
